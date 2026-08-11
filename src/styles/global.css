@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kertas: #EFECE8;
+  --color-sage:   #CECDB2;
+  --color-olive:  #83692C;
+  --color-gelap:  #4E4117;
+  --color-ink:    #2A2410;
+  --color-ink-2:  #837E71;
+  --color-rule:   #CFCCC5;
+  --font-sans: "Kumbh Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@font-face {
+  font-family: "Kumbh Sans";
+  src: url("/fonts/KumbhSans.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--color-kertas); color: var(--color-ink); font-family: var(--font-sans); }
