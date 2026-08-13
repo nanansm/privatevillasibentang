@@ -1,0 +1,51 @@
+---
+// Satu layar menjawab "ini apa". Teks berdiri sendiri di atas putih, foto
+// menyusul di bawahnya — tidak ada teks menumpang foto, jadi nol scrim.
+import { Picture } from "astro:assets";
+import foto from "../assets/photos/mote-9679.jpg";
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang];
+
+const alt =
+  lang === "en"
+    ? "A woman standing in a villa doorway, steps leading down to a private hot spring pool."
+    : "Perempuan berdiri di ambang pintu villa, tangga turun menuju kolam air panas privat.";
+---
+
+<section class="w-full pt-12 md:pt-20">
+  <div class="mx-auto w-full max-w-[76rem] px-6 md:grid md:grid-cols-[1fr_480px] md:items-center md:gap-12 md:px-10">
+    <div>
+      <p class="text-[12px] leading-[1.2] font-semibold tracking-[0.16em] text-ink-2 uppercase">
+        {t.hero.kicker}
+      </p>
+
+      <h1 class="mt-4 max-w-[15ch] text-[40px] leading-[1.05] font-bold tracking-[-0.02em] text-ink md:text-[60px] md:leading-[1.02]">
+        {t.hero.h1}
+      </h1>
+
+      <p class="mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
+        {t.hero.sub}
+      </p>
+
+      <a href="#villas" class="mt-6 inline-block underline underline-offset-4">
+        {t.hero.villasLink}
+      </a>
+    </div>
+
+    <div class="mt-10 md:mt-0 md:max-w-[480px] md:ml-auto">
+      <Picture
+        src={foto}
+        alt={alt}
+        widths={[390, 780, 1170]}
+        sizes="(min-width:768px) 480px, calc(100vw - 3rem)"
+        formats={["avif", "webp"]}
+        loading="eager"
+        fetchpriority="high"
+        class="h-auto w-full"
+      />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,71 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: "id" | "en";
+  /** Halaman tautan bio sengaja tidak diindeks supaya tidak menyaingi halaman utama. */
+  noindex?: boolean;
+  /** Padanan bahasa untuk hreflang: { en: "/", id: "/id/" } */
+  alternate?: { id: string; en: string };
+}
+
+const {
+  title = "Private Villa Sibentang",
+  description = "Sembilan villa privat berkolam air panas alami di Cipanas, Garut.",
+  lang = "en",
+  noindex = false,
+  alternate,
+} = Astro.props;
+
+const SITE = "https://sibentang.kampungsumberalam.com";
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
+    {
+      alternate && (
+        <>
+          <link rel="alternate" hreflang="en" href={SITE + alternate.en} />
+          <link rel="alternate" hreflang="id" href={SITE + alternate.id} />
+          <link rel="alternate" hreflang="x-default" href={SITE + alternate.en} />
+        </>
+      )
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Private Villa Sibentang" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang === "id" ? "id_ID" : "en_US"} />
+    <meta property="og:url" content={SITE + Astro.url.pathname} />
+    <meta property="og:image" content={SITE + "/og.jpg"} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Kolam air panas privat di Private Villa Sibentang, Cipanas, Garut" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href={SITE + Astro.url.pathname} />
+    <link
+      rel="preload"
+      href="/fonts/KumbhSans.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <meta name="theme-color" content="#4E4117" />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

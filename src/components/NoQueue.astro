@@ -1,0 +1,62 @@
+---
+// Menanam diagnosis: di Cipanas orang antre berendam, di sini tidak.
+// Tiga angka dibaca sebagai ledger (baris demi baris), bukan kartu.
+// Fotonya satu-satunya lanskap di koleksi, jadi sengaja tidak full-width.
+import { Picture } from "astro:assets";
+import kolam from "../assets/photos/mote-9734.jpg";
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang];
+
+const alt =
+  lang === "en"
+    ? "A private hot spring pool in a Sibentang villa yard, with a carved stone panel and palms behind it."
+    : "Kolam air panas privat di halaman villa Sibentang, dengan panel batu ukir dan palem di belakangnya.";
+---
+
+<section class="mx-auto mt-24 w-full max-w-[76rem] px-6 md:mt-40 md:px-10">
+  <div class="md:grid md:grid-cols-12 md:gap-x-10">
+    <div class="md:col-span-5">
+      <h2
+        class="muncul max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
+      >
+        {t.noQueue.h2}
+      </h2>
+
+      <p class="muncul mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
+        {t.noQueue.body}
+      </p>
+    </div>
+
+    <div class="md:col-span-7">
+      <div class="muncul mt-10 w-full md:mt-0">
+        <Picture
+          src={kolam}
+          alt={alt}
+          widths={[390, 780, 960]}
+          sizes="(min-width:768px) 55vw, 100vw"
+          formats={["avif", "webp"]}
+          loading="lazy"
+          class="h-auto w-full"
+        />
+      </div>
+    </div>
+
+    <dl class="muncul mt-12 md:col-span-12 md:mt-24 md:grid md:grid-cols-3 md:gap-x-10">
+      {
+        t.noQueue.stats.map((s) => (
+          <div class="border-t border-rule py-5">
+            <dt class="text-[36px] leading-none font-bold tracking-[-0.02em] text-olive md:text-[56px]">
+              {s.number}
+            </dt>
+            <dd class="mt-2 max-w-[28ch] text-[15px] leading-[1.45] text-ink md:text-[16px]">
+              {s.label}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

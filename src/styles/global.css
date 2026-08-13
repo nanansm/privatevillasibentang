@@ -20,4 +20,24 @@
 }
 
 html { -webkit-text-size-adjust: 100%; }
-body { background: var(--color-kertas); color: var(--color-ink); font-family: var(--font-sans); }
+body { background: #FFFFFF; color: var(--color-ink); font-family: var(--font-sans); }
+
+/* Gerak masuk saat digulir. Native CSS scroll-driven, nol JavaScript, jadi
+   tidak menambah satu byte pun ke jalur kritis. Alasannya penceritaan:
+   tiap bagian muncul berurutan mengikuti kecepatan baca, bukan hiasan.
+   Browser tanpa dukungan `animation-timeline` melewatinya dan isinya
+   langsung terlihat penuh. */
+@keyframes muncul {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .muncul {
+      animation: muncul linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 26%;
+    }
+  }
+}

@@ -1,0 +1,12 @@
+import puppeteer from "puppeteer-core";
+const b = await puppeteer.launch({executablePath:"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless:"new", args:["--hide-scrollbars"]});
+const p = await b.newPage();
+await p.setViewport({width:390,height:844,deviceScaleFactor:2,isMobile:true});
+await p.goto(process.argv[2],{waitUntil:"networkidle0"});
+await p.evaluate(()=>document.fonts.ready);
+await p.evaluate(()=>document.querySelector("#villas").scrollIntoView({block:"start"}));
+await new Promise(r=>setTimeout(r,900));
+const op = await p.evaluate(()=>[...document.querySelectorAll(".muncul")].map(e=>+getComputedStyle(e).opacity.slice(0,4)));
+console.log("opacity elemen .muncul setelah digulir:", JSON.stringify(op));
+await p.screenshot({path:process.argv[3]});
+await b.close();

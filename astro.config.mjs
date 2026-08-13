@@ -5,21 +5,31 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://sibentang.com',
+  // Domain induk kampungsumberalam.com dibeli klien; Sibentang jalan di subdomain ini.
+  site: 'https://sibentang.kampungsumberalam.com',
   i18n: {
-    locales: ['id', 'en'],
-    defaultLocale: 'id',
+    locales: ['en', 'id'],
+    defaultLocale: 'en',
     routing: { prefixDefaultLocale: false },
   },
   integrations: [
     sitemap({
+      // Halaman tautan bio sengaja noindex, dan /pratinjau cuma buat review internal.
+      // Keduanya jangan masuk sitemap — sitemap yang memuat halaman noindek itu sinyal rancu.
+      filter: (page) =>
+        !page.includes('/link') && !page.includes('/pratinjau'),
       i18n: {
-        defaultLocale: 'id',
-        locales: { id: 'id-ID', en: 'en-US' },
+        defaultLocale: 'en',
+        locales: { en: 'en-US', id: 'id-ID' },
       },
     }),
   ],
   vite: {
     plugins: [tailwindcss()],
+  },
+  build: {
+    // CSS-nya kecil (satu halaman, satu huruf, empat warna); inline penuh
+    // menghapus satu round-trip render-blocking di jalur kritis LCP.
+    inlineStylesheets: "always",
   },
 });

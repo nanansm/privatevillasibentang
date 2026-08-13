@@ -1,0 +1,84 @@
+---
+// Satu pelat penutup: pemesanan + identitas dilebur jadi satu blok gelap,
+// elemen terakhir halaman. Lihat blueprint 4.7-4.8.
+import ornamen from "../assets/brand/ornamen.svg?raw";
+import { copy, type Lang } from "../i18n/copy";
+import {
+  waUrl,
+  MAPS_URL,
+  TRAVELOKA_URL,
+  AGODA_URL,
+  ALAMAT,
+  IG_URL,
+} from "../config";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang];
+---
+
+<section class="mt-24 bg-gelap py-20 text-kertas md:mt-40">
+  <div class="mx-auto w-full max-w-[76rem] px-6 md:px-10">
+    <span class="block h-9 w-9 text-kertas [&>svg]:h-full [&>svg]:w-full" set:html={ornamen} />
+
+    <h2 class="muncul mt-4 max-w-[24rem] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-kertas md:text-[40px] md:leading-[1.08]">
+      {t.booking.h2}
+    </h2>
+
+    <div class="mt-10 md:grid md:grid-cols-12 md:items-start md:gap-x-10">
+      <div class="md:col-span-5">
+        <a
+          href={waUrl(t.booking.waMessage)}
+          target="_blank"
+          rel="noopener"
+          class="inline-block bg-kertas px-6 py-4 text-base leading-none font-semibold tracking-[0.02em] text-gelap"
+        >
+          {t.booking.cta}
+        </a>
+
+        <p class="mt-8 text-[13px] leading-[1.5] text-kertas/60">
+          {lang === "en" ? (
+            <>
+              Also listed on{" "}
+              <a href={TRAVELOKA_URL} target="_blank" rel="noopener" class="underline underline-offset-2">Traveloka</a>
+              {" "}and{" "}
+              <a href={AGODA_URL} target="_blank" rel="noopener" class="underline underline-offset-2">Agoda</a>.
+            </>
+          ) : (
+            <>
+              Juga terdaftar di{" "}
+              <a href={TRAVELOKA_URL} target="_blank" rel="noopener" class="underline underline-offset-2">Traveloka</a>
+              {" "}dan{" "}
+              <a href={AGODA_URL} target="_blank" rel="noopener" class="underline underline-offset-2">Agoda</a>.
+            </>
+          )}
+        </p>
+      </div>
+
+      <div class="mt-10 md:col-span-3 md:mt-0">
+        <p class="max-w-[22rem] text-base leading-[1.6] text-kertas">{ALAMAT}</p>
+        <a href={MAPS_URL} target="_blank" rel="noopener" class="mt-3 inline-block text-base leading-[1.6] text-kertas underline underline-offset-4">
+          {t.booking.mapsLink}
+        </a>
+      </div>
+
+      <div class="mt-12 border-t border-kertas/25 pt-8 md:col-span-4 md:mt-0 md:border-t-0 md:border-l md:pt-0 md:pl-10">
+        <p class="text-[12px] leading-[1.2] font-semibold tracking-[0.16em] text-kertas uppercase">
+          {t.booking.kicker}
+        </p>
+        <p class="mt-1 text-[12px] leading-[1.2] font-semibold tracking-[0.16em] text-kertas uppercase">
+          {t.booking.by}
+        </p>
+
+        <a href={IG_URL} target="_blank" rel="noopener" class="mt-5 block text-base leading-[1.6] text-kertas">
+          {t.booking.ig}
+        </a>
+        <a href={t.booking.langSwitchHref} class="mt-2 block text-base leading-[1.6] text-kertas underline underline-offset-2">
+          {t.booking.langSwitchLabel}
+        </a>
+
+        <p class="mt-7 text-[13px] leading-[1.5] text-kertas/60">{t.booking.copyright}</p>
+      </div>
+    </div>
+  </div>
+</section>

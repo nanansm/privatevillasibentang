@@ -1,0 +1,33 @@
+---
+// Deretan sembilan ikon unit sebagai irama (pola dari deck: ornamen bunga diulang).
+// Ikon di-inline supaya nol permintaan jaringan tambahan.
+import melati from "../assets/brand/unit-melati.svg?raw";
+import aster from "../assets/brand/unit-aster.svg?raw";
+import asoka from "../assets/brand/unit-asoka.svg?raw";
+import mawar from "../assets/brand/unit-mawar.svg?raw";
+import padma from "../assets/brand/unit-padma.svg?raw";
+import seruni from "../assets/brand/unit-seruni.svg?raw";
+import cendana from "../assets/brand/unit-cendana.svg?raw";
+import lily from "../assets/brand/unit-lily.svg?raw";
+import anggrek from "../assets/brand/unit-anggrek.svg?raw";
+
+interface Props { size?: string; class?: string; }
+const { size = "0.75rem", class: cls = "" } = Astro.props;
+
+const icons = [melati, aster, asoka, mawar, padma, seruni, cendana, lily, anggrek];
+---
+
+<div
+  class={`flex items-center justify-between ${cls}`}
+  style={`--s:${size}`}
+  aria-hidden="true"
+>
+  {
+    icons.map((svg) => (
+      <span
+        class="block [&>svg]:block [&>svg]:h-[var(--s)] [&>svg]:w-auto"
+        set:html={svg}
+      />
+    ))
+  }
+</div>

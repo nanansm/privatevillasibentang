@@ -1,27 +1,55 @@
 // Satu sumber kebenaran untuk data yang gampang berubah.
 // Nilai belum pasti = string kosong / 0 + komentar TODO. Jangan mengarang.
 
-export const SITE_URL = "https://sibentang.com"; // TODO domain belum final
+// Domain induk kampungsumberalam.com dibeli klien; Sibentang jalan di subdomain.
+export const SITE_URL = "https://sibentang.kampungsumberalam.com";
 
 export const SITE_NAME = "Private Villa Sibentang";
 export const TAGLINE_EN = "Sundanese Thermal Escape";
 
-export const WA_NUMBER = ""; // TODO nomor WA khusus Sibentang belum ada
+// Nomor WhatsApp Sibentang, dikonfirmasi Nanan 11 Agu 2026 (081112117838).
+export const WA_NUMBER = "6281112117838";
 
 /** Bikin link wa.me dari nomor + pesan prefilled. */
 export function waUrl(pesan: string): string {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`;
 }
 
-export const MAPS_URL = ""; // TODO link Google Maps belum ada
-export const IG_URL = "https://instagram.com/privatevillasibentang";
-export const TRAVELOKA_URL = ""; // TODO listing Traveloka belum ada
-export const AGODA_URL = ""; // TODO listing Agoda belum ada
+// Pencarian Maps pakai nama resmi di Google Business Profile. Sengaja pakai
+// bentuk pencarian, bukan place id, karena profilnya belum di-claim.
+export const MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=Sibentang+Wellness+Private+Villa+Garut";
 
-export const RATING = {
-  value: 4.7,
-  count: 93,
-};
+export const IG_URL = "https://www.instagram.com/privatevillasibentang/";
 
-export const PRICE_FROM_1BR = 0; // TODO harga mulai 1BR belum fix
-export const PRICE_FROM_2BR = 0; // TODO harga mulai 2BR belum fix
+// Agoda + Instagram sudah dites balas 200. Traveloka menolak pemeriksaan
+// otomatis (403 ke bot, termasuk browser headless) — WAJIB diklik manual sekali
+// sebelum halaman ini dipublikasikan.
+export const TRAVELOKA_URL =
+  "https://www.traveloka.com/en-id/hotel/indonesia/sibentang-private-villa-3000020008081";
+export const AGODA_URL =
+  "https://www.agoda.com/sibentang-wellness-private-villa/hotel/garut-id.html";
+
+export const ALAMAT = "Jl. Raya Cipanas No. 122, Tarogong Kaler, Garut 44151";
+
+// Rating dibuang atas permintaan klien, dilarang dipakai di materi apa pun.
+
+export const PRICE_FROM_1BR = 3059000;
+export const PRICE_FROM_2BR = 4259000;
+
+// BAR weekend, dynamic pricing, sumber sheet internal klien 12 Agu 2026.
+export const PRICE_WEEKEND_1BR = 3719000;
+export const PRICE_WEEKEND_2BR = 5599000;
+
+// Klausa tambahan jawaban "bisa mobil masuk?", kosong sampai dikonfirmasi.
+// [BUTUH DATA: konfirmasi lebar akses internal + parkir per villa]
+export const ACCESS_INFO_EXTRA = "";
+
+/** Format rupiah tanpa desimal, mis. formatIDR(1500000) -> "1.500.000". */
+export function formatIDR(n: number): string {
+  return n.toLocaleString("id-ID");
+}
+
+// Gerbang peluncuran (lihat blueprint bagian 6 langkah 8): homepage tetap
+// noindex sampai kedua harga terisi DAN klausa akses terjawab.
+export const LAUNCH_READY = PRICE_FROM_1BR > 0 && PRICE_FROM_2BR > 0;

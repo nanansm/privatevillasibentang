@@ -1,0 +1,21 @@
+---
+// Identitas dan saklar bahasa, bar statis putih di atas hero. Nol JS,
+// nol hamburger.
+import wordmark from "../assets/brand/wordmark.svg?raw";
+import type { Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+---
+
+<header class="h-14 border-b border-rule">
+  <div class="mx-auto flex h-14 w-full max-w-[76rem] items-center justify-between px-6 md:px-10">
+    <a href={lang === "en" ? "/" : "/id/"} class="block w-24 shrink-0 text-ink [&>svg]:h-auto [&>svg]:w-full" aria-label="Private Villa Sibentang">
+      <Fragment set:html={wordmark} />
+    </a>
+    <nav class="flex items-center gap-3 text-[14px] text-ink" aria-label="Bahasa / Language">
+      <a href="/" class={lang === "en" ? "font-bold underline underline-offset-2" : "font-normal opacity-80"}>EN</a>
+      <a href="/id/" class={lang === "id" ? "font-bold underline underline-offset-2" : "font-normal opacity-80"}>ID</a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,143 @@
+---
+// Halaman tautan untuk bio Instagram.
+// Satu tugas: orang yang datang dari bio bisa langsung chat atau memesan.
+//
+// Foto fasad dipasang penuh tepi ke tepi tanpa sudut membulat. Wordmark
+// ditaruh di BAGIAN ATAS foto supaya kolam renang di bawah tidak tertutup.
+import { Image } from "astro:assets";
+import wordmark from "../assets/brand/wordmark.svg?raw";
+import ornamen from "../assets/brand/ornamen.svg?raw";
+import foto from "../assets/photos/mote-9760.jpg";
+import Irama from "./Irama.astro";
+import {
+  waUrl,
+  MAPS_URL,
+  IG_URL,
+  TRAVELOKA_URL,
+  AGODA_URL,
+  ALAMAT,
+} from "../config";
+
+interface Props { lang?: "id" | "en"; }
+const { lang = "id" } = Astro.props;
+
+const t = {
+  id: {
+    intro: "Sembilan villa privat berkolam air panas alami di Cipanas, Garut.",
+    wa: "Chat Admin Sibentang",
+    traveloka: "Cek tanggal & harga di Traveloka",
+    agoda: "Pesan lewat Agoda",
+    maps: "Direct Google Map",
+    ig: "Instagram @privatevillasibentang",
+    unit: "Sembilan unit, sembilan nama bunga",
+    alt: "Unit villa Sibentang dengan kolam air panas privat di halamannya",
+  },
+  en: {
+    intro: "Nine private villas with natural hot spring pools in Cipanas, Garut.",
+    wa: "Chat Admin Sibentang",
+    traveloka: "Check dates & rates on Traveloka",
+    agoda: "Book on Agoda",
+    maps: "Direct Google Map",
+    ig: "Instagram @privatevillasibentang",
+    unit: "Nine villas, nine flower names",
+    alt: "A Sibentang villa with its own hot spring pool in the yard",
+  },
+}[lang];
+
+const pesanWa =
+  lang === "id"
+    ? "Halo, saya mau tanya ketersediaan Private Villa Sibentang."
+    : "Hello, I would like to ask about availability at Private Villa Sibentang.";
+
+const tautan = [
+  { href: TRAVELOKA_URL, label: t.traveloka },
+  { href: AGODA_URL, label: t.agoda },
+  { href: MAPS_URL, label: t.maps },
+  { href: IG_URL, label: t.ig },
+];
+
+const pil =
+  "block rounded-full px-6 py-4 text-center text-[0.92rem] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive";
+---
+
+<main class="mx-auto max-w-[30rem] bg-kertas text-ink">
+  <!-- Foto penuh tepi ke tepi. Wordmark di atas, kolam di bawah tetap terlihat. -->
+  <div class="relative">
+    <Image
+      src={foto}
+      alt={t.alt}
+      widths={[390, 780]}
+      width={780}
+      height={936}
+      sizes="(max-width: 480px) 100vw, 480px"
+      loading="eager"
+      fetchpriority="high"
+      class="h-[54svh] max-h-[28rem] w-full object-cover object-[38%_center]"
+    />
+
+    <div
+      class="absolute inset-x-0 top-0 bg-linear-to-b from-gelap via-gelap/70 to-transparent px-6 pt-7 pb-16"
+    >
+      <div
+        class="w-[62%] text-kertas [&>svg]:h-auto [&>svg]:w-full"
+        set:html={wordmark}
+      />
+      <p class="mt-3 text-[0.6rem] font-medium tracking-[0.28em] text-sage">
+        SUNDANESE THERMAL ESCAPE
+      </p>
+    </div>
+  </div>
+
+  <div class="px-6 pt-7 pb-10">
+    <p class="text-center text-[0.95rem] leading-[1.6] text-ink-2">{t.intro}</p>
+
+    <div class="mt-7 space-y-3">
+      <a
+        href={waUrl(pesanWa)}
+        target="_blank"
+        rel="noopener"
+        class={`${pil} bg-gelap font-bold text-kertas`}
+      >
+        {t.wa}
+      </a>
+
+      {
+        tautan.map((b) => (
+          <a
+            href={b.href}
+            target="_blank"
+            rel="noopener"
+            class={`${pil} border border-olive/45 bg-transparent font-medium text-ink`}
+          >
+            {b.label}
+          </a>
+        ))
+      }
+    </div>
+
+    <!-- Sembilan ikon = sembilan unit. Penanda yang membawa informasi, bukan hiasan. -->
+    <div class="mt-10">
+      <Irama class="text-sage" size="0.65rem" />
+      <p class="mt-3 text-center text-[0.7rem] text-ink-2">{t.unit}</p>
+    </div>
+  </div>
+
+  <footer class="bg-gelap px-6 py-10 text-center text-kertas">
+    <!-- Susunan baris bawah lockup resmi: keterangan tipe · ornamen · pengakuan
+         induk. Tanpa wordmark, karena wordmark sudah dipakai di atas foto. -->
+    <div class="flex items-center justify-center gap-3">
+      <span class="text-[0.58rem] font-semibold tracking-[0.16em] whitespace-nowrap">
+        SIGNATURE PRIVATE VILLA
+      </span>
+      <span
+        class="block w-[0.9rem] shrink-0 text-kertas [&>svg]:h-auto [&>svg]:w-full"
+        set:html={ornamen}
+      />
+      <span class="text-left text-[0.58rem] leading-[1.35] font-semibold tracking-[0.1em]">
+        BY KAMPUNG<br />SUMBER ALAM
+      </span>
+    </div>
+
+    <p class="mt-7 text-[0.7rem] leading-[1.7] text-kertas/60">{ALAMAT}</p>
+  </footer>
+</main>

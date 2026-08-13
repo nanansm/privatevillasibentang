@@ -1,0 +1,117 @@
+---
+// Rakitan homepage tunggal, dipakai index.astro (EN) dan id/index.astro (ID)
+// dengan prop lang saja, nol duplikasi markup. Urutan render: lihat
+// blueprint bagian 4.
+import { getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import SiteHeader from "./SiteHeader.astro";
+import HeroSpring from "./HeroSpring.astro";
+import NoQueue from "./NoQueue.astro";
+import FlowerRegistry from "./FlowerRegistry.astro";
+import InsideVilla from "./InsideVilla.astro";
+import ThermalJourneys from "./ThermalJourneys.astro";
+import OneGate from "./OneGate.astro";
+import ThreeAnswers from "./ThreeAnswers.astro";
+import BookingBand from "./BookingBand.astro";
+import heroFoto from "../assets/photos/mote-9679.jpg";
+import { copy, type Lang } from "../i18n/copy";
+import {
+  SITE_URL,
+  ALAMAT,
+  WA_NUMBER,
+  IG_URL,
+  TRAVELOKA_URL,
+  AGODA_URL,
+  LAUNCH_READY,
+} from "../config";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang];
+
+// Preload HARUS persis sama dengan kandidat pertama <picture> (format AVIF,
+// widths yang sama) supaya browser tidak mengunduh dua berkas berbeda untuk
+// foto yang sama di jalur kritis LCP.
+const heroWidths = [390, 780, 1170];
+const heroAvifVariants = await Promise.all(
+  heroWidths.map((width) => getImage({ src: heroFoto, width, format: "avif" })),
+);
+const heroSrcset = heroAvifVariants
+  .map((v) => `${v.src} ${v.attributes.width}w`)
+  .join(", ");
+const imagesizes = "(min-width:768px) 480px, calc(100vw - 3rem)";
+
+// JSON-LD LodgingBusiness. Sengaja TANPA aggregateRating (klien minta
+// dibuang) dan TANPA geo, belum ada koordinat terverifikasi untuk lokasi
+// persis, dan blueprint melarang mengarang data.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  name: "Private Villa Sibentang",
+  url: SITE_URL + (lang === "en" ? "/" : "/id/"),
+  telephone: `+${WA_NUMBER}`,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: ALAMAT,
+    addressLocality: "Tarogong Kaler",
+    addressRegion: "Garut",
+    postalCode: "44151",
+    addressCountry: "ID",
+  },
+  image: heroAvifVariants.map((v) => new URL(v.src, SITE_URL).href),
+  priceRange: "Rp 3.059.000 - Rp 5.599.000",
+  containedInPlace: {
+    "@type": "Resort",
+    name: "Kampung Sumber Alam Resort",
+  },
+  sameAs: [IG_URL, TRAVELOKA_URL, AGODA_URL],
+};
+
+// JSON-LD FAQPage, di-generate persis dari t.faq.items yang tampil di
+// halaman (ThreeAnswers.astro) — jangan hardcode ulang teksnya di sini.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: t.faq.items.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.a,
+    },
+  })),
+};
+---
+
+<Base
+  lang={lang}
+  title={t.meta.title}
+  description={t.meta.description}
+  noindex={!LAUNCH_READY}
+  alternate={{ en: "/", id: "/id/" }}
+>
+  <Fragment slot="head">
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset={heroSrcset}
+      imagesizes={imagesizes}
+      fetchpriority="high"
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <SiteHeader lang={lang} />
+  <main>
+    <HeroSpring lang={lang} />
+    <NoQueue lang={lang} />
+    <FlowerRegistry lang={lang} />
+    <InsideVilla lang={lang} />
+    <ThermalJourneys lang={lang} />
+    <OneGate lang={lang} />
+    <ThreeAnswers lang={lang} />
+    <BookingBand lang={lang} />
+  </main>
+</Base>
