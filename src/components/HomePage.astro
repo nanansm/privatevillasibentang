@@ -13,7 +13,7 @@ import ThermalJourneys from "./ThermalJourneys.astro";
 import OneGate from "./OneGate.astro";
 import ThreeAnswers from "./ThreeAnswers.astro";
 import BookingBand from "./BookingBand.astro";
-import heroFoto from "../assets/photos/mote-9679.jpg";
+import heroFoto from "../assets/photos/mote-9760.jpg";
 import { copy, type Lang } from "../i18n/copy";
 import {
   SITE_URL,
@@ -39,7 +39,7 @@ const heroAvifVariants = await Promise.all(
 const heroSrcset = heroAvifVariants
   .map((v) => `${v.src} ${v.attributes.width}w`)
   .join(", ");
-const imagesizes = "(min-width:768px) 480px, calc(100vw - 3rem)";
+const imagesizes = "(min-width:768px) 55vw, calc(100vw - 3rem)";
 
 // JSON-LD LodgingBusiness. Sengaja TANPA aggregateRating (klien minta
 // dibuang) dan TANPA geo, belum ada koordinat terverifikasi untuk lokasi

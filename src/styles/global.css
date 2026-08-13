@@ -6,7 +6,11 @@
   --color-olive:  #83692C;
   --color-gelap:  #4E4117;
   --color-ink:    #2A2410;
-  --color-ink-2:  #837E71;
+  /* Digelapkan dari #837E71 (4,05:1 di putih, gagal WCAG AA untuk teks
+     12-13px seperti kicker, figcaption, dan catatan tarif). #6F6A5D = 5,39:1
+     di putih dan 4,58:1 di kertas, jadi lolos AA di dua latar yang dipakai
+     tanpa keluar dari keluarga netral hangat palet. */
+  --color-ink-2:  #6F6A5D;
   --color-rule:   #CFCCC5;
   --font-sans: "Kumbh Sans", ui-sans-serif, system-ui, sans-serif;
 }

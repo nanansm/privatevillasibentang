@@ -19,6 +19,19 @@ const browser = await puppeteer.launch({
 });
 
 const page = await browser.newPage();
+
+// Section ber-`.muncul` dianimasikan `animation-timeline: view()`, jadi kalau
+// dibiarkan mereka mulai dari opacity 0. Screenshot fullPage TIDAK menjalankan
+// scroll-driven timeline itu, hasilnya section kosong melompong yang terbaca
+// seperti bug padahal halamannya baik-baik saja. Minta reduced-motion supaya
+// `@media (prefers-reduced-motion: no-preference)` di global.css tidak aktif
+// dan semua isi tampil penuh. Set RM=0 kalau memang mau memotret animasinya.
+if (process.env.RM !== "0") {
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" },
+  ]);
+}
+
 await page.setViewport({
   width: Number(w),
   height: Number(h),

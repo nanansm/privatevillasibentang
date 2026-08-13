@@ -1,9 +1,14 @@
 ---
 // Menanam diagnosis: di Cipanas orang antre berendam, di sini tidak.
 // Tiga angka dibaca sebagai ledger (baris demi baris), bukan kartu.
-// Fotonya satu-satunya lanskap di koleksi, jadi sengaja tidak full-width.
+//
+// Fotonya WAJIB kolam yang kelihatan kolam. Sebelumnya di sini terpasang
+// mote-9734, yaitu foto riak air jarak dekat — abstrak, tidak membuktikan
+// apa pun, dan alt text di bawah malah menggambarkan foto yang lain.
+// Klien sudah minta foto riak itu diganti foto villa berikut kolamnya;
+// permintaan itu sempat tidak pernah sampai ke baris import ini.
 import { Picture } from "astro:assets";
-import kolam from "../assets/photos/mote-9734.jpg";
+import kolam from "../assets/photos/mote-9730.jpg";
 import { copy, type Lang } from "../i18n/copy";
 
 interface Props { lang: Lang; }

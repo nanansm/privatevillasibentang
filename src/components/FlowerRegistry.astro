@@ -47,7 +47,7 @@ const alt =
     <div class="md:grid md:grid-cols-12 md:gap-x-10">
     <div class="md:col-span-5">
     <h2
-      class="muncul max-w-[16ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
+      class="muncul max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
     >
       {t.registry.h2}
     </h2>
@@ -107,8 +107,8 @@ const alt =
       }
       <div class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-2">
         {
-          grup2.map((u, i) => (
-            <div class={`flex min-h-[124px] md:min-h-[150px] flex-col justify-between bg-sage/45 p-4 ${i === grup2.length - 1 ? "col-span-2" : ""}`}>
+          grup2.map((u) => (
+            <div class="flex min-h-[124px] flex-col justify-between bg-sage/45 p-4 md:min-h-[150px]">
               <span
                 class="h-14 w-14 text-olive [&>svg]:h-full [&>svg]:w-full"
                 set:html={u.svg}

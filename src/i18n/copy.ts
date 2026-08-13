@@ -10,7 +10,13 @@ export const copy = {
       description:
         "Nine private villas inside Kampung Sumber Alam, a Sundanese thermal sanctuary village in Cipanas, Garut. Each villa keeps its own natural hot spring pool in the yard. Book via WhatsApp.",
     },
-    header: { self: "EN", other: "ID" },
+    header: {
+      self: "EN",
+      other: "ID",
+      // Wordmark sendirian tidak memberi tahu orang asing bahwa ini
+      // penginapan. Deskriptor ini yang menjawabnya sebelum h1 terbaca.
+      descriptor: "Hot spring villas, Garut",
+    },
     hero: {
       kicker: "SUNDANESE THERMAL ESCAPE",
       h1: "A hot spring pool you never share.",
@@ -122,7 +128,11 @@ export const copy = {
       description:
         "Sembilan villa privat di dalam Kampung Sumber Alam, sanctuary thermal khas Sunda di Cipanas, Garut. Tiap villa punya kolam air panas alami sendiri di halamannya. Booking lewat WhatsApp.",
     },
-    header: { self: "ID", other: "EN" },
+    header: {
+      self: "ID",
+      other: "EN",
+      descriptor: "Villa kolam air panas, Garut",
+    },
     hero: {
       kicker: "SUNDANESE THERMAL ESCAPE",
       h1: "Kolam air panas yang tidak dipakai gantian.",
