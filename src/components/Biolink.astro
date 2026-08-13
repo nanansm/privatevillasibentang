@@ -12,7 +12,11 @@
 //   memanjang setinggi seluruh panel lewat posisi absolut, isi dan penutup
 //   menumpuk di kolom kanan. Tanpa ini halaman jadi kolom 480px terapung di
 //   tengah layar 1440px, terbaca seperti tangkapan layar ponsel.
-import { Image } from "astro:assets";
+// `Picture`, bukan `Image`. Terbukti di produksi: `Image` tanpa prop `format`
+// memakai default Astro, dan halaman ini terkirim WebP saja sementara homepage
+// sudah AVIF. Sekarang dua-duanya menawarkan AVIF lebih dulu, WebP sebagai
+// cadangan, jadi tidak ada lagi halaman yang tertinggal formatnya.
+import { Picture } from "astro:assets";
 import wordmark from "../assets/brand/wordmark.svg?raw";
 import ornamen from "../assets/brand/ornamen.svg?raw";
 // mote-9760 pindah jadi foto hero homepage, jadi halaman ini pakai foto lain
@@ -42,6 +46,9 @@ const t = {
   id: {
     intro: "Sembilan villa privat berkolam air panas alami di Cipanas, Garut.",
     wa: "Chat Admin Sibentang",
+    // Teks dipakai apa adanya di dua bahasa, sesuai permintaan, sama seperti
+    // "Direct Google Map" yang juga tidak diterjemahkan.
+    beranda: "All Information about Sibentang",
     traveloka: "Cek tanggal & harga di Traveloka",
     agoda: "Pesan lewat Agoda",
     maps: "Direct Google Map",
@@ -52,6 +59,7 @@ const t = {
   en: {
     intro: "Nine private villas with natural hot spring pools in Cipanas, Garut.",
     wa: "Chat Admin Sibentang",
+    beranda: "All Information about Sibentang",
     traveloka: "Check dates & rates on Traveloka",
     agoda: "Book on Agoda",
     maps: "Direct Google Map",
@@ -82,15 +90,15 @@ const pil =
 >
   <!-- Foto penuh tepi ke tepi. Wordmark di atas, kolam di bawah tetap terlihat. -->
   <div class="relative md:col-start-1 md:row-span-2 md:row-start-1">
-    <Image
+    <Picture
       src={foto}
       alt={t.alt}
-      widths={[390, 780, 960]}
-      width={780}
-      height={936}
+      widths={[390, 585, 780, 960]}
       sizes="(max-width: 480px) 100vw, 480px"
+      formats={["avif", "webp"]}
       loading="eager"
       fetchpriority="high"
+      pictureAttributes={{ class: "block" }}
       class="h-[54svh] max-h-[28rem] w-full object-cover object-[38%_center] md:absolute md:inset-0 md:h-full md:max-h-none"
     />
 
@@ -118,6 +126,17 @@ const pil =
         class={`${pil} bg-gelap font-bold text-kertas`}
       >
         {t.wa}
+      </a>
+
+      {/* Satu-satunya tautan ke dalam situs sendiri, jadi tanpa target="_blank"
+          dan tanpa rel="noopener" — membuka tab baru untuk halaman sendiri cuma
+          menumpuk tab. Ditaruh tepat di bawah tombol WhatsApp karena inilah
+          langkah lanjut yang wajar buat orang yang belum siap chat. */}
+      <a
+        href={lang === "id" ? "/id/" : "/"}
+        class={`${pil} border border-olive/45 bg-transparent font-medium text-ink`}
+      >
+        {t.beranda}
       </a>
 
       {
