@@ -4,10 +4,27 @@
 //
 // Foto fasad dipasang penuh tepi ke tepi tanpa sudut membulat. Wordmark
 // ditaruh di BAGIAN ATAS foto supaya kolam renang di bawah tidak tertutup.
+//
+// Dua tata letak, satu markup:
+// - Mobile (<768px): tumpukan foto, isi, penutup. Ini bentuk yang sudah
+//   disetujui, jadi tidak ada satu pun kelas mobile yang diubah.
+// - Desktop (>=768px): panel dua kolom. Foto pindah ke kolom kiri dan
+//   memanjang setinggi seluruh panel lewat posisi absolut, isi dan penutup
+//   menumpuk di kolom kanan. Tanpa ini halaman jadi kolom 480px terapung di
+//   tengah layar 1440px, terbaca seperti tangkapan layar ponsel.
 import { Image } from "astro:assets";
 import wordmark from "../assets/brand/wordmark.svg?raw";
 import ornamen from "../assets/brand/ornamen.svg?raw";
-import foto from "../assets/photos/mote-9760.jpg";
+// mote-9760 pindah jadi foto hero homepage, jadi halaman ini pakai foto lain
+// supaya dua halaman tidak membuka dengan gambar yang sama persis.
+//
+// mote-9747 dipilih karena tidak ada orang di dalamnya. Ini satu-satunya foto
+// di halaman ini yang dipotong `object-cover`, dan rasio potongnya berubah
+// jauh antara mobile (0,87) dan desktop (0,67). Foto berisi orang kepalanya
+// terpotong di salah satu dari dua rasio itu; foto arsitektur aman di
+// dua-duanya. Isinya tetap membuktikan janji halaman: paviliun villa yang
+// terbuka langsung ke kolam privat.
+import foto from "../assets/photos/mote-9747.jpg";
 import Irama from "./Irama.astro";
 import {
   waUrl,
@@ -30,7 +47,7 @@ const t = {
     maps: "Direct Google Map",
     ig: "Instagram @privatevillasibentang",
     unit: "Sembilan unit, sembilan nama bunga",
-    alt: "Unit villa Sibentang dengan kolam air panas privat di halamannya",
+    alt: "Paviliun villa Sibentang yang terbuka langsung ke kolam air panas privat di halamannya",
   },
   en: {
     intro: "Nine private villas with natural hot spring pools in Cipanas, Garut.",
@@ -40,7 +57,7 @@ const t = {
     maps: "Direct Google Map",
     ig: "Instagram @privatevillasibentang",
     unit: "Nine villas, nine flower names",
-    alt: "A Sibentang villa with its own hot spring pool in the yard",
+    alt: "A Sibentang villa pavilion opening straight onto its private hot spring pool",
   },
 }[lang];
 
@@ -60,26 +77,28 @@ const pil =
   "block rounded-full px-6 py-4 text-center text-[0.92rem] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive";
 ---
 
-<main class="mx-auto max-w-[30rem] bg-kertas text-ink">
+<main
+  class="mx-auto max-w-[30rem] bg-kertas text-ink md:my-14 md:grid md:max-w-[60rem] md:grid-cols-2 md:grid-rows-[1fr_auto] md:min-h-[36rem]"
+>
   <!-- Foto penuh tepi ke tepi. Wordmark di atas, kolam di bawah tetap terlihat. -->
-  <div class="relative">
+  <div class="relative md:col-start-1 md:row-span-2 md:row-start-1">
     <Image
       src={foto}
       alt={t.alt}
-      widths={[390, 780]}
+      widths={[390, 780, 960]}
       width={780}
       height={936}
       sizes="(max-width: 480px) 100vw, 480px"
       loading="eager"
       fetchpriority="high"
-      class="h-[54svh] max-h-[28rem] w-full object-cover object-[38%_center]"
+      class="h-[54svh] max-h-[28rem] w-full object-cover object-[38%_center] md:absolute md:inset-0 md:h-full md:max-h-none"
     />
 
     <div
-      class="absolute inset-x-0 top-0 bg-linear-to-b from-gelap via-gelap/70 to-transparent px-6 pt-7 pb-16"
+      class="absolute inset-x-0 top-0 bg-linear-to-b from-gelap via-gelap/70 to-transparent px-6 pt-7 pb-16 md:px-8 md:pt-9"
     >
       <div
-        class="w-[62%] text-kertas [&>svg]:h-auto [&>svg]:w-full"
+        class="w-[62%] text-kertas md:w-[58%] [&>svg]:h-auto [&>svg]:w-full"
         set:html={wordmark}
       />
       <p class="mt-3 text-[0.6rem] font-medium tracking-[0.28em] text-sage">
@@ -88,7 +107,7 @@ const pil =
     </div>
   </div>
 
-  <div class="px-6 pt-7 pb-10">
+  <div class="px-6 pt-7 pb-10 md:col-start-2 md:row-start-1 md:flex md:flex-col md:justify-center md:px-10 md:py-12">
     <p class="text-center text-[0.95rem] leading-[1.6] text-ink-2">{t.intro}</p>
 
     <div class="mt-7 space-y-3">
@@ -122,7 +141,7 @@ const pil =
     </div>
   </div>
 
-  <footer class="bg-gelap px-6 py-10 text-center text-kertas">
+  <footer class="bg-gelap px-6 py-10 text-center text-kertas md:col-start-2 md:row-start-2 md:px-10 md:py-8">
     <!-- Susunan baris bawah lockup resmi: keterangan tipe · ornamen · pengakuan
          induk. Tanpa wordmark, karena wordmark sudah dipakai di atas foto. -->
     <div class="flex items-center justify-center gap-3">

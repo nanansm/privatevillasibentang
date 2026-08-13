@@ -22,11 +22,14 @@ export const MAPS_URL =
 
 export const IG_URL = "https://www.instagram.com/privatevillasibentang/";
 
-// Agoda + Instagram sudah dites balas 200. Traveloka menolak pemeriksaan
-// otomatis (403 ke bot, termasuk browser headless) — WAJIB diklik manual sekali
-// sebelum halaman ini dipublikasikan.
-export const TRAVELOKA_URL =
-  "https://www.traveloka.com/en-id/hotel/indonesia/sibentang-private-villa-3000020008081";
+// Agoda + Instagram sudah dites balas 200.
+//
+// Tautan pendek Traveloka dari klien, 13 Agu 2026. Sudah dites: balas 302 dan
+// mendarat di listing "Kampung Sumber Alam Garut Powered by Archipelago"
+// (hotel 3000010005938), BUKAN listing "Sibentang Private Villa"
+// (3000020008081) yang dipakai sebelumnya. Tautan ini juga membawa kode
+// afiliasi AFFILIATENANANPROGRAM83.
+export const TRAVELOKA_URL = "https://trv.lk/7f628e23";
 export const AGODA_URL =
   "https://www.agoda.com/sibentang-wellness-private-villa/hotel/garut-id.html";
 
