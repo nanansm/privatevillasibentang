@@ -63,9 +63,67 @@ const SITE = "https://sibentang.kampungsumberalam.com";
       crossorigin
     />
     <meta name="theme-color" content="#4E4117" />
+
+    {/* Meta Pixel 1049322851258484. Dipasang di semua halaman, termasuk
+        /link, karena halaman tautan bio itu justru pintu masuk trafik
+        Instagram. `is:inline` wajib supaya Astro tidak membundel ulang
+        cuplikan resmi Meta.
+
+        Bedanya dengan cuplikan mentah cuma SATU: kapan fbevents.js diunduh.
+        Cuplikan asli menyisipkannya seketika, dan itu terukur mahal di sini
+        — fbevents.js 104KB plus satu berkas konfigurasi 63KB merebut main
+        thread tepat di jendela LCP, terukur Render Delay 3,3 detik di
+        Lighthouse mobile. Halaman ini nol JavaScript selain pixel, jadi
+        seluruh ongkosnya kelihatan.
+
+        Yang dilakukan di bawah: `fbq('init')` dan `fbq('track','PageView')`
+        tetap dipanggil SEKETIKA seperti biasa. Pemanggilan itu masuk antrean
+        `fbq.queue` bawaan Meta, lalu diputar ulang begitu pustakanya termuat,
+        jadi urutan dan isi event-nya sama persis. Pustakanya sendiri baru
+        diunduh setelah halaman selesai melukis, atau lebih cepat lagi kalau
+        pengunjung menyentuh halaman duluan.
+
+        Konsekuensinya jujur: pengunjung yang menutup tab dalam sedetik
+        pertama tanpa menyentuh apa pun tidak terhitung. Kalau kamu lebih
+        suka pixel menyala paling awal dan rela LCP naik, panggil saja
+        `muat()` langsung tanpa penjadwalan. */}
+    <link rel="preconnect" href="https://connect.facebook.net" />
+    <script is:inline>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];f.__muatPixel=function(){if(f.__pixelDimuat)return;
+      f.__pixelDimuat=1;t=b.createElement(e);t.async=!0;t.src=v;
+      s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}
+      (window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+
+      fbq('init', '1049322851258484');
+      fbq('track', 'PageView');
+
+      (function (w, d) {
+        var muat = w.__muatPixel;
+        if (d.readyState === 'complete') setTimeout(muat, 0);
+        else w.addEventListener('load', function () { setTimeout(muat, 0); }, { once: true });
+        ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) {
+          w.addEventListener(ev, muat, { once: true, passive: true });
+        });
+      })(window, document);
+    </script>
+
     <slot name="head" />
   </head>
   <body>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display:none"
+        alt=""
+        src="https://www.facebook.com/tr?id=1049322851258484&ev=PageView&noscript=1"
+      /></noscript
+    >
     <slot />
   </body>
 </html>

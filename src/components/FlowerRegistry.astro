@@ -44,23 +44,23 @@ const alt =
 
 <section id="villas" class="mt-24 md:mt-40">
   <div class="mx-auto w-full max-w-[76rem] px-6 md:px-10">
-    <div class="md:grid md:grid-cols-12 md:gap-x-10">
+    <div class="muncul md:grid md:grid-cols-12 md:gap-x-10">
     <div class="md:col-span-5">
     <h2
-      class="muncul max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
+      class="max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
     >
       {t.registry.h2}
     </h2>
-    <p class="muncul mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
+    <p class="mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
       {t.registry.body}
     </p>
-    <p class="muncul mt-3 max-w-[38ch] text-[13px] leading-[1.5] text-ink-2">
+    <p class="mt-3 max-w-[38ch] text-[13px] leading-[1.5] text-ink-2">
       {t.registry.dynamicNote}
     </p>
     </div>
 
     <div class="md:col-span-7">
-    <div class="muncul mt-12 md:mt-0">
+    <div class="mt-12 md:mt-0">
       <h3 class="text-[17px] leading-[1.35] font-semibold text-ink">
         {t.registry.group1Label}
       </h3>
@@ -91,7 +91,7 @@ const alt =
       </div>
     </div>
 
-    <div class="muncul mt-12">
+    <div class="mt-12">
       <h3 class="text-[17px] leading-[1.35] font-semibold text-ink">
         {t.registry.group2Label}
       </h3>
@@ -126,17 +126,17 @@ const alt =
       href={waUrl(t.registry.waMessage)}
       target="_blank"
       rel="noopener"
-      class="muncul mt-8 inline-block text-[17px] underline underline-offset-4 text-ink"
+      class="mt-8 inline-block text-[17px] underline underline-offset-4 text-ink"
     >
       {t.registry.ctaLabel}
     </a>
 
-    <figure class="muncul mt-16">
+    <figure class="mt-16">
       <Picture
         src={pintuLily}
         alt={alt}
-        widths={[390, 780, 880]}
-        sizes="(min-width: 768px) 55vw, 100vw"
+        widths={[390, 640, 780, 880]}
+        sizes="(min-width:1216px) 646px, (min-width:768px) 55vw, calc(100vw - 3rem)"
         formats={["avif", "webp"]}
         loading="lazy"
         class="h-auto w-full"

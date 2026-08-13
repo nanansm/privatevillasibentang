@@ -7,6 +7,11 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   // Domain induk kampungsumberalam.com dibeli klien; Sibentang jalan di subdomain ini.
   site: 'https://sibentang.kampungsumberalam.com',
+  // Astro membangun URL bergaya direktori (/link/index.html), jadi canonical
+  // yang dihasilkan selalu berakhiran garis miring. Dikunci di sini supaya
+  // dev, preview, dan produksi tidak berbeda dan hreflang tidak menunjuk
+  // varian tanpa garis miring yang lalu kena redirect.
+  trailingSlash: 'always',
   i18n: {
     locales: ['en', 'id'],
     defaultLocale: 'en',

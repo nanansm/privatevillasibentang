@@ -10,17 +10,17 @@ const { lang } = Astro.props;
 const t = copy[lang];
 ---
 
-<section class="mx-auto mt-24 w-full max-w-[76rem] px-6 md:mt-40 md:px-10 md:grid md:grid-cols-12 md:gap-x-10">
+<section class="muncul mx-auto mt-24 w-full max-w-[76rem] px-6 md:mt-40 md:px-10 md:grid md:grid-cols-12 md:gap-x-10">
   <div class="md:col-span-5">
     <h2
-      class="muncul max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
+      class="max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
     >
       {t.faq.h2}
     </h2>
   </div>
 
   <div class="md:col-span-7">
-    <div class="muncul mt-8 md:mt-0">
+    <div class="mt-8 md:mt-0">
       {
         t.faq.items.map((item, i) => (
           <details class="group border-t border-rule last:border-b" open={i === 0}>

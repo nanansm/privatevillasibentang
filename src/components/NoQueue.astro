@@ -22,26 +22,26 @@ const alt =
 ---
 
 <section class="mx-auto mt-24 w-full max-w-[76rem] px-6 md:mt-40 md:px-10">
-  <div class="md:grid md:grid-cols-12 md:gap-x-10">
+  <div class="muncul md:grid md:grid-cols-12 md:gap-x-10">
     <div class="md:col-span-5">
       <h2
-        class="muncul max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
+        class="max-w-[17ch] text-[29px] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-ink md:text-[44px] md:leading-[1.08]"
       >
         {t.noQueue.h2}
       </h2>
 
-      <p class="muncul mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
+      <p class="mt-5 max-w-[38ch] text-[17px] leading-[1.6] text-ink md:text-[18px]">
         {t.noQueue.body}
       </p>
     </div>
 
     <div class="md:col-span-7">
-      <div class="muncul mt-10 w-full md:mt-0">
+      <div class="mt-10 w-full md:mt-0">
         <Picture
           src={kolam}
           alt={alt}
-          widths={[390, 780, 960]}
-          sizes="(min-width:768px) 55vw, 100vw"
+          widths={[390, 640, 780, 960]}
+          sizes="(min-width:1216px) 646px, (min-width:768px) 55vw, calc(100vw - 3rem)"
           formats={["avif", "webp"]}
           loading="lazy"
           class="h-auto w-full"
@@ -49,7 +49,7 @@ const alt =
       </div>
     </div>
 
-    <dl class="muncul mt-12 md:col-span-12 md:mt-24 md:grid md:grid-cols-3 md:gap-x-10">
+    <dl class="mt-12 md:col-span-12 md:mt-24 md:grid md:grid-cols-3 md:gap-x-10">
       {
         t.noQueue.stats.map((s) => (
           <div class="border-t border-rule py-5">
