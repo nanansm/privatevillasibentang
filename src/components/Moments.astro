@@ -1,0 +1,305 @@
+---
+// Sticky-scroll moments (Pagi/Sore/Malam). Port dari prototipe
+// Sibentang-Website/index.html — `.moments#momen`.
+//
+// Panel 340vh, sticky top:0 height:100svh, gambar cross-fade + progress
+// bar, tiga blok teks bergantian mengikuti scroll. Dua kolom di atas
+// 820px, satu kolom dengan gambar 4/3 di bawahnya — persis prototipe di
+// KEDUA ukuran.
+//
+// Percobaan sebelumnya menumpuk ketiga momen jadi urutan statis di layar
+// sempit dengan alasan 340vh menyiksa di ponsel. Ditolak: rancangan tim
+// harus diikuti apa adanya. Satu-satunya penyimpangan yang tersisa ada
+// di `prefers-reduced-motion`, karena panel sticky yang tidak beranimasi
+// berarti menggulir 340vh tanpa ada yang berubah.
+import { Picture } from "astro:assets";
+import jalan from "../assets/foto2026/jalan.jpg";
+import teh from "../assets/foto2026/teh.jpg";
+import kolam from "../assets/foto2026/kolam.jpg";
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = copy[lang];
+const foto = [jalan, teh, kolam];
+---
+
+<div class="moments" id="momen">
+  <div class="moments-sticky">
+    <div class="moments-grid">
+      <div class="m-visual">
+        {
+          t.moments.map((m, i) => (
+            <div class:list={["m-img", { on: i === 0 }]}>
+              <Picture
+                src={foto[i]}
+                alt={m.imgAlt}
+                widths={[480, 640, 860]}
+                sizes="(min-width:821px) 38vw, 92vw"
+                formats={["avif", "webp"]}
+                loading="lazy"
+                class="block h-full w-full object-cover"
+              />
+            </div>
+          ))
+        }
+        <div class="m-progress">
+          <div class="m-bar" id="mBar"></div>
+        </div>
+      </div>
+      <div class="m-texts">
+        {
+          t.moments.map((m, i) => (
+            <div class:list={["m-text", { on: i === 0 }]}>
+              <span class="kicker">{m.kicker}</span>
+              <h3>{m.h3}</h3>
+              <p>{m.p}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .moments {
+    position: relative;
+    height: 340vh;
+  }
+  .moments-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 5vw;
+    overflow: hidden;
+  }
+  .moments-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5vw;
+    align-items: center;
+    width: 100%;
+    max-width: var(--maxw);
+  }
+  .m-visual {
+    position: relative;
+    aspect-ratio: 1 / 1.25;
+    max-height: 78svh;
+    width: 100%;
+    border-radius: 0.75em;
+    overflow: hidden;
+  }
+  .m-img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .m-img.on {
+    opacity: 1;
+  }
+  .m-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: rgba(239, 236, 232, 0.18);
+    z-index: 3;
+  }
+  .m-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--paper);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .m-texts {
+    position: relative;
+    min-height: 14em;
+  }
+  .m-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+    pointer-events: none;
+    max-width: 30em;
+  }
+  .m-text.on {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .m-text .kicker {
+    color: var(--sage);
+  }
+  .m-text h3 {
+    font-size: clamp(1.9rem, 3.4vw, 3rem);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+  .m-text p {
+    font-size: 15.5px;
+    color: rgba(239, 236, 232, 0.75);
+    max-width: 44ch;
+  }
+
+  /* Layar sempit mengikuti referensi PERSIS: sticky 340vh dipertahankan,
+     cuma jadi satu kolom dengan gambar 4/3. Versi sebelumnya menumpuk
+     ketiga momen jadi urutan statis — itu menyimpang dari rancangan tim
+     dan sudah ditolak. */
+  @media (max-width: 820px) {
+    .moments-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: start;
+      padding-top: 10svh;
+    }
+    .m-visual {
+      aspect-ratio: 4 / 3;
+      max-height: 44svh;
+    }
+    .m-texts {
+      min-height: 16em;
+    }
+    .m-text {
+      justify-content: flex-start;
+    }
+  }
+
+  /* Urutan statis disisakan HANYA untuk yang minta kurangi gerak — buat
+     mereka, panel sticky sepanjang 340vh yang tidak beranimasi berarti
+     menggulir jauh tanpa ada yang berubah. */
+  @media (prefers-reduced-motion: reduce) {
+    .moments {
+      height: auto;
+    }
+    .moments-sticky {
+      position: static;
+      height: auto;
+      padding: clamp(3rem, 10vh, 5rem) 5vw;
+      overflow: visible;
+    }
+    .moments-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      max-width: 100%;
+    }
+    /* Lepas box wrapper supaya anaknya ikut jadi flex item .moments-grid,
+       jadi gambar & teks tiap momen bisa diselang-seling lewat order. */
+    .m-visual,
+    .m-texts {
+      display: contents;
+    }
+    .m-img {
+      position: static;
+      opacity: 1 !important;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: none;
+      border-radius: 0.75em;
+      overflow: hidden;
+    }
+    .m-img:nth-of-type(1) {
+      order: 1;
+    }
+    .m-img:nth-of-type(2) {
+      order: 3;
+    }
+    .m-img:nth-of-type(3) {
+      order: 5;
+    }
+    .m-progress {
+      display: none;
+    }
+    .m-text {
+      position: static;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto;
+    }
+    .m-text:nth-of-type(1) {
+      order: 2;
+    }
+    .m-text:nth-of-type(2) {
+      order: 4;
+    }
+    .m-text:nth-of-type(3) {
+      order: 6;
+    }
+  }
+</style>
+
+<script>
+  // Kontroler sticky moments. Jalan di SEMUA lebar layar, sama seperti
+  // referensi — dulu dimatikan di bawah 821px dan itu yang bikin seksinya
+  // menyimpang. Satu-satunya yang masih di-no-op: pengunjung yang minta
+  // kurangi gerak, dan untuk mereka CSS di atas sudah menampilkan ketiga
+  // momen secara statis. Guard dibaca tiap frame supaya ikut resize.
+  (function () {
+    const wrap = document.querySelector<HTMLElement>(".moments");
+    if (!wrap) return;
+    const imgs = Array.from(wrap.querySelectorAll<HTMLElement>(".m-img"));
+    const texts = Array.from(wrap.querySelectorAll<HTMLElement>(".m-text"));
+    const bar = wrap.querySelector<HTMLElement>(".m-bar");
+    const n = imgs.length;
+    if (!n) return;
+    const reduceMq = matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Satu pembacaan tata letak per frame. Kelas 'on' cuma dipindah kalau
+    // momen aktifnya benar-benar berganti — sebelumnya enam elemen disentuh
+    // tiap event scroll padahal indeksnya sama.
+    let idxTerpasang = -1;
+    let menunggu = false;
+
+    function terapkan() {
+      menunggu = false;
+      if (reduceMq.matches) return;
+      const r = wrap!.getBoundingClientRect();
+      const total = r.height - innerHeight;
+      if (total <= 0) return;
+      const prog = Math.max(0, Math.min(1, -r.top / total));
+      const idx = Math.min(n - 1, Math.floor(prog * n));
+      if (idx !== idxTerpasang) {
+        if (idxTerpasang >= 0) {
+          imgs[idxTerpasang]?.classList.remove("on");
+          texts[idxTerpasang]?.classList.remove("on");
+        }
+        imgs[idx]?.classList.add("on");
+        texts[idx]?.classList.add("on");
+        idxTerpasang = idx;
+      }
+      if (bar) {
+        const seg = prog * n - idx;
+        bar.style.transform = `scaleX(${Math.max(0.02, Math.min(1, seg))})`;
+      }
+    }
+
+    function onScroll() {
+      if (menunggu) return;
+      menunggu = true;
+      requestAnimationFrame(terapkan);
+    }
+
+    addEventListener("scroll", onScroll, { passive: true });
+    terapkan();
+  })();
+</script>

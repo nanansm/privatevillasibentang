@@ -23,8 +23,80 @@
   font-style: normal;
 }
 
+/* Token plumbing dari prototipe homepage baru (Sibentang-Website/index.html).
+   Nama variabel sengaja dibiarkan sama seperti prototipe (--paper, --sage,
+   dst) supaya section component fase berikutnya bisa copy-paste kelas dari
+   prototipe tanpa remap nama token. Terpisah dari @theme di atas karena
+   @theme cuma menerima namespace --color-* untuk generate utility Tailwind. */
+:root {
+  --paper: #EFECE8;
+  --sage: #CECDB2;
+  --olive: #83692C;
+  --ink: #4E4117;
+  --line: rgba(78, 65, 23, .16);
+  --maxw: 1280px;
+}
+
 html { -webkit-text-size-adjust: 100%; }
-body { background: #FFFFFF; color: var(--color-ink); font-family: var(--font-sans); }
+body {
+  font-family: "Kumbh Sans", var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16.5px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 5vw; }
+
+/* ===== grain overlay ===== */
+.grain {
+  /* Prototipe memakai filter SVG feTurbulence yang dihitung ulang browser
+     tiap kali lapisan ini dirasterisasi. Terukur di Lighthouse mobile:
+     sendirian menahan LCP 4,1 dtk dan skor perf 84; dimatikan, 2,7 dtk
+     dan 96. Teksturnya dipertahankan, cuma sumbernya diganti ubin noise
+     128px yang sudah jadi (1,3 KB) — tidak ada filter yang perlu dihitung
+     dan tidak ada permintaan jaringan tambahan. */
+  position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .05;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAMFBMVEX////u7u7d3d3MzMy7u7uqqqqZmZmIiIh3d3dmZmZVVVVEREQzMzMiIiIREREAAABvgLxBAAAE00lEQVR42u3XjTsTeADA8dnMbl5ixmabJlqYl2qcWmGdmYquqMj7e7iMO1FGsvP6tHLylF4lznVermNeDvd4TTbGuAkbT8tLSycxMSPH2uP+g/sD7vn9EZ/n+3xhPUXR7ZqQR3X1AdCrFJuORgqhooMQPo/3ozQoE6i1i3p3p2Du3A+whr7w07WurYFJ/pCshIlOI9Yn3H1qFGcVmuQjMOBq6J79WsXm5I0lJ9U7Cmkbpxx1xdonnKrMNRDn7O7FjVKGj3uYXoeWagX/oCWeWd5ayebFClrjbcxFLRoVcCc8z9MCOz4zhnR57YiK/O2sQbOnWD8m7QFtvPnj9iGWUfJL6+pxWUUq6vD9+P2RyoxEG9TBvv7Zt6YlVqcJkF579N/yjwrblfak/maR1auXV2iId8LH7/eKmQ5cqvlGqXXTws6SeyGjJ7HhyaWmyZuczwpWnGDAeGFsCMrJNITcFq8uJJ07UtMu9JE64F/IOnIkc+gHNda70nDPdVQHGXvkSydGRl27xspSfozmVyV7zvPrSrH6LV88BYGrvnNq2FEe/B2CrF2nkdz5mPwWRa8yQ7s/teguUJn3FlXv25Va+dR+9HdawhtToT96swuz1/davtt51D24mbE9zpJQLodJN/xIbDKb871Nrt8uk/ScJ1on/MjSEmiE0jKYpl6V0g9phz5axz73vnEDt9s92iIiTmthsBxJ12dx9GojnAdgMctbR1xKIMf6WzdLc3iXvxVepNqObA2ItA/okdxrKLXjTWuhe346ReNTXf7IvtI3j7vTnEtsQ8feIVGL5I4yV2h00U5v97PYvJsB+Qhb+YttdaaPneW0nIzxEZWsfPC2NmTuVBb7iCHxpilfvFzDVAoRmyXohwfNlSwR2nSC1BCz8oy5Vax3b3NOgkjG9qsmLC3SOowehd6wOdk3fb7nrmJAepdbhnFu89vNsjZZ3dwbDVli67D114udXHHfVY9CYuBlqFNTiU5v4Fh/6LPA1LkLtV2BM3zDbryy0Sygp9Q8Q+rsIOoYtTWMtImpXOHnDYmziUHOk9CG4ZF8CQMBeyWSML1fnvlL146C/uV2SVvKbOb0zjdeoRl3zm9/FTAYroMmpn1WWDYk6M9fKiYlYMM8KMJFYsREcCE3fZ6BUUI+dWft9w53QBbhiBsrXGzKFmu3tg7R16pHaNkZBee7zb8PQfP4uJahtWS1ulIv/enP1GZvpIUixFD2K6xiXx4UuY+3h3FrXdPj6gFiLH7IWKsy9mIbqZCsiSQ7qq4XGoUpzPolIfwaA97JxKhxpyi5Yvx4qnEWtdN+AlNvN9QI8yC6FbcX5Fd5oKaYWv1eiU164XlttKtrSgHnOu2f3BdLVuUPN8vSJe5MqEmmxn25rf42DClg7jBHuqizKgMJ0Ag0Ao1AI9AINAKNQCPQCDQCjUAj0Pi/1ghRXztqGHZmeSKsQN2FW+fNcKWk/MzWFsRZ+1vQTwUStw6vPwObpg/ZT4VUVssY77cPIy5IovD1npuc1Li6wstwGP3c8UbJa3N6FjoPQ2oIoku5RWnTmgUYOzxzbUPpNlifmD25eGx4mf5Qb8uFwJjy9ZUYOw/GrKiez0TKCD7LgDPgDDiDuAKNQCPQCDQCjUAj0Ag0Ao1gPP9rPP8FmiZm9Fob43QAAAAASUVORK5CYII=");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* ===== micro label ===== */
+.kicker {
+  font-size: 11px; letter-spacing: .24em; text-transform: uppercase; font-weight: 600;
+}
+.paren { font-size: 13px; letter-spacing: .02em; color: rgba(78, 65, 23, .6); }
+
+/* ===== button system ===== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  background: var(--ink); color: var(--paper); border: 1px solid var(--ink);
+  padding: 17px 30px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+  transition: background .25s ease, border-color .25s ease, color .25s ease;
+}
+.btn::after { content: "→"; font-size: 14px; transition: transform .25s ease; }
+.btn:hover { background: var(--olive); border-color: var(--olive); color: var(--paper); }
+.btn:hover::after { transform: translateX(5px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 12px;
+  border: 1px solid rgba(78, 65, 23, .45); padding: 14px 24px;
+  font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+  transition: background .25s ease, color .25s ease, border-color .25s ease;
+}
+.btn-ghost::after { content: "→"; font-size: 14px; transition: transform .25s ease; }
+.btn-ghost:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn-ghost:hover::after { transform: translateX(5px); }
+
+/* ===== reveal util ===== */
+.rv { opacity: 0; transform: translateY(34px); transition: opacity 1s ease, transform 1s cubic-bezier(.22,1,.36,1); }
+.rv.in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv { opacity: 1; transform: none; }
+}
 
 /* Gerak masuk saat digulir. Native CSS scroll-driven, nol JavaScript, jadi
    tidak menambah satu byte pun ke jalur kritis. Alasannya penceritaan:

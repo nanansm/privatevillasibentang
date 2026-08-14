@@ -1,31 +1,133 @@
 ---
-// Identitas dan saklar bahasa, bar statis putih di atas hero. Nol JS,
-// nol hamburger.
+// Nav dalam hero, port dari prototipe <nav class="hero-nav">: logo kiri,
+// baris tautan di tengah. Duduk di atas video hero (lihat Hero.astro),
+// makanya wordmark diwarnai --paper, bukan --ink.
 //
-// Deskriptor di bawah wordmark sengaja ada: kata "Sibentang" saja tidak
-// memberi tahu pendatang baru bahwa ini penginapan, dan sebelum ini satu
-// satunya penjelas ada di h1 yang belum tentu dibaca. Ditulis huruf biasa,
-// bukan kapital berjarak, supaya jatah penanda kapital halaman tidak
-// bertambah.
-import wordmark from "../assets/brand/wordmark.svg?raw";
+// Slot kanan dulu tombol Reservasi WA; sejak 14 Agu 2026 diganti pengalih
+// bahasa ID/EN. Ajakan ke WhatsApp tetap ada di seksi Reservasi paling
+// bawah, jadi tidak ada jalan masuk yang hilang.
+import wordmark from "../assets/brand/lockup-utama.svg?raw";
 import { copy, type Lang } from "../i18n/copy";
 
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const t = copy[lang];
+
+// Rute bahasa dikunci di astro.config.mjs: EN default tanpa awalan, ID di
+// /id/. trailingSlash 'always', jadi garis miring penutup wajib ada —
+// tanpa itu kena redirect satu putaran.
+const bahasa = [
+  { kode: "id" as const, label: "ID", href: "/id/" },
+  { kode: "en" as const, label: "EN", href: "/" },
+];
 ---
 
-<header class="border-b border-rule">
-  <div class="mx-auto flex w-full max-w-[76rem] items-center justify-between gap-4 px-6 py-3 md:px-10">
-    <div class="flex min-w-0 flex-col gap-1">
-      <a href={lang === "en" ? "/" : "/id/"} class="block w-24 shrink-0 text-ink [&>svg]:h-auto [&>svg]:w-full" aria-label="Private Villa Sibentang">
-        <Fragment set:html={wordmark} />
-      </a>
-      <p class="text-[12px] leading-[1.3] text-ink-2">{t.header.descriptor}</p>
-    </div>
-    <nav class="flex items-center gap-3 text-[14px] text-ink" aria-label="Bahasa / Language">
-      <a href="/" class={lang === "en" ? "font-bold underline underline-offset-2" : "font-normal opacity-80"}>EN</a>
-      <a href="/id/" class={lang === "id" ? "font-bold underline underline-offset-2" : "font-normal opacity-80"}>ID</a>
-    </nav>
+<nav class="hero-nav">
+  <a class="hero-brand" href="#top" aria-label={t.hero.brandAlt}>
+    <Fragment set:html={wordmark} />
+  </a>
+  <div class="hero-links">
+    {t.hero.nav.map((item) => <a href={item.href}>{item.label}</a>)}
   </div>
-</header>
+  <div class="hero-lang" role="group" aria-label={t.hero.langSwitchLabel}>
+    {
+      bahasa.map((b, i) => (
+        <>
+          {i > 0 && <span class="hero-lang-sep" aria-hidden="true">/</span>}
+          <a
+            class:list={["hero-lang-opt", { on: b.kode === lang }]}
+            href={b.href}
+            hreflang={b.kode}
+            lang={b.kode}
+            aria-current={b.kode === lang ? "true" : undefined}
+          >
+            {b.label}
+          </a>
+        </>
+      ))
+    }
+  </div>
+</nav>
+
+<style>
+  .hero-nav {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 26px 5vw 0;
+    gap: 20px;
+  }
+  .hero-brand {
+    display: block;
+    width: clamp(120px, 12vw, 168px);
+    color: var(--paper);
+  }
+  .hero-brand :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero-links {
+    display: flex;
+    gap: 34px;
+    justify-self: center;
+  }
+  .hero-links a {
+    font-size: 11.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--paper);
+    opacity: 0.9;
+  }
+  .hero-links a:hover {
+    opacity: 1;
+  }
+  /* Kotaknya meneruskan bahasa visual tombol Reservasi yang digantikan:
+     border tipis, huruf kapital berjarak, tinggi yang sama. */
+  .hero-lang {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(239, 236, 232, 0.55);
+    padding: 11px 18px;
+  }
+  .hero-lang-opt {
+    font-size: 11.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--paper);
+    /* Yang tidak aktif diredupkan, bukan disembunyikan — pengunjung harus
+       bisa lihat ada pilihan lain sebelum menyadari perlu mengekliknya. */
+    opacity: 0.55;
+    transition: opacity 0.25s ease;
+  }
+  .hero-lang-opt:hover {
+    opacity: 1;
+  }
+  .hero-lang-opt.on {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+  }
+  .hero-lang-sep {
+    font-size: 11.5px;
+    color: rgba(239, 236, 232, 0.4);
+  }
+  @media (max-width: 820px) {
+    .hero-links {
+      display: none;
+    }
+    .hero-nav {
+      grid-template-columns: 1fr auto;
+    }
+    .hero-brand {
+      width: clamp(100px, 26vw, 140px);
+    }
+  }
+</style>

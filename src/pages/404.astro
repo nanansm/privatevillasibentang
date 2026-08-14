@@ -1,17 +1,23 @@
 ---
-// Stub polos. Belum didesain — perlu status 404 asli biar Cloudflare Pages
-// gak nyajiin homepage (200) buat URL yang gak dikenal.
+// Halaman 404 asli (bukan stub) biar Cloudflare Pages gak nyajiin homepage
+// (200) buat URL yang gak dikenal. Pakai Base yang sama dengan halaman lain
+// supaya dapat font, meta, dan tokens gratis tanpa duplikasi <head>.
+import Base from "../layouts/Base.astro";
 ---
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex" />
-    <title>404 — Halaman tidak ditemukan</title>
-  </head>
-  <body>
-    <h1>404</h1>
-    <p>Halaman tidak ditemukan.</p>
-    <p><a href="/">Kembali ke beranda</a></p>
-  </body>
-</html>
+<Base
+  lang="id"
+  noindex
+  title="404 — Halaman tidak ditemukan | Private Villa Sibentang"
+  description="Halaman yang Anda cari tidak ditemukan di situs Private Villa Sibentang."
+>
+  <main class="wrap flex min-h-[70svh] flex-col items-center justify-center gap-5 py-24 text-center">
+    <span class="kicker text-(--olive)">404</span>
+    <h1 class="text-[clamp(2rem,6vw,3.2rem)] font-medium tracking-[-0.02em] text-(--ink)">
+      Halaman tidak ditemukan
+    </h1>
+    <p class="max-w-[42ch] text-[15.5px] text-(--ink)/75">
+      Tautan yang Anda buka mungkin sudah pindah atau tidak lagi tersedia.
+    </p>
+    <a href="/" class="btn mt-3">Kembali ke Beranda</a>
+  </main>
+</Base>

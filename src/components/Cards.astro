@@ -1,0 +1,59 @@
+---
+// Cards (tawaran): Room. Experience. Escape. Port dari prototipe
+// <section class="cards" id="tawaran">. Foto villa.jpg, ambang.jpg, taman.jpg
+// dipotong 3/4 (crop disetujui pemilik) lewat astro:assets Picture.
+import { Picture } from "astro:assets";
+import villa from "../assets/foto2026/villa.jpg";
+import ambang from "../assets/foto2026/ambang.jpg";
+import taman from "../assets/foto2026/taman.jpg";
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang].cards;
+
+const images = [villa, ambang, taman];
+---
+
+<section class="cards" id="tawaran">
+  <div class="cards-in">
+    <span class="paren rv">{t.paren}</span>
+    <h2 class="rv">{t.h2}</h2>
+    <p class="cards-lead rv">{t.lead}</p>
+    <div class="cards-grid">
+      {t.items.map((item, i) => (
+        <div class="card rv">
+          <Picture
+            src={images[i]}
+            alt={item.imgAlt}
+            widths={[400, 600, 800]}
+            sizes="(min-width: 900px) 32vw, 90vw"
+            formats={["avif", "webp"]}
+            loading="lazy"
+            class="card-img"
+          />
+          <div class="card-cap">
+            <span class="kicker">{item.kicker}</span>
+            <h3>{item.h3}</h3>
+            <p>{item.p}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cards { padding: clamp(5rem, 12vh, 9rem) 5vw; }
+  .cards-in { max-width: var(--maxw); margin: 0 auto; }
+  .cards .paren { display: block; margin-bottom: 14px; }
+  .cards h2 { font-size: clamp(2.2rem, 4.6vw, 3.6rem); font-weight: 500; letter-spacing: -.02em; line-height: 1.1; max-width: 20ch; }
+  .cards-lead { margin-top: 24px; max-width: 58ch; font-size: 16.5px; color: rgba(78, 65, 23, .8); }
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.2vw; margin-top: clamp(3rem, 7vh, 5rem); }
+  @media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; gap: 48px; } }
+  .card :global(.card-img) { aspect-ratio: 3 / 4; width: 100%; height: auto; object-fit: cover; display: block; }
+  .card-cap { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 16px; }
+  .card-cap .kicker { color: var(--olive); display: block; margin-bottom: 10px; }
+  .card-cap h3 { font-size: clamp(1.3rem, 1.9vw, 1.65rem); font-weight: 500; line-height: 1.25; letter-spacing: -.01em; max-width: 20ch; }
+  .card-cap p { font-size: 14.5px; color: rgba(78, 65, 23, .7); margin-top: 10px; max-width: 38ch; }
+</style>

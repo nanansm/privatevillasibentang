@@ -15,6 +15,11 @@
 /og.jpg
   Cache-Control: public, max-age=2592000
 
+# Video hero namanya tidak ber-hash, jadi jangan ditandai immutable — nanti
+# hasil encode baru tertahan di cache pengunjung lama. Sebulan sudah cukup.
+/video/*
+  Cache-Control: public, max-age=2592000
+
 # HTML boleh disimpan sebentar tapi harus divalidasi ulang, supaya perubahan
 # harga atau copy tidak tertahan di cache pengunjung.
 /*

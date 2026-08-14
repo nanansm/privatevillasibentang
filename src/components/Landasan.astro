@@ -1,0 +1,141 @@
+---
+// Landasan (falsafah induk Kampung Sumber Alam). Port dari prototipe
+// <section class="landasan" id="landasan">: latar sage, tiga prinsip dengan
+// garis rambut yang membesar saat masuk viewport, lalu blockquote dengan
+// sapuan highlight per-kata mengikuti scroll (dipecah di server supaya
+// teksnya utuh tanpa JS), dan penutup dengan satu frasa tebal.
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang].landasan;
+
+const quoteWords = t.quote.split(" ");
+// Frasa "Sundanese Thermal Escape" ditebalkan di prototipe (<strong>) di
+// dalam paragraf penutup. copy.ts menyimpan teks polos, jadi frasa itu
+// dipecah di sini supaya markup <strong>-nya bisa dipasang tanpa mengubah
+// sumber copy.
+const closeParts = t.close.split(/(Sundanese Thermal Escape)/);
+---
+
+<section class="landasan" id="landasan">
+  <div class="landasan-in">
+    <span class="paren rv">{t.paren}</span>
+    <h2 class="rv">{t.h2}</h2>
+    <p class="landasan-lead rv">{t.lead}</p>
+
+    <div class="prinsip">
+      {t.principles.map((pr) => (
+        <div class="prin rv">
+          <span class="kicker">{pr.kicker}</span>
+          <h3>{pr.h3}</h3>
+          <p>{pr.p}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="landasan-quote">
+      <blockquote id="quoteHl">
+        {quoteWords.map((w, i) => <><span class="qw">{w}</span>{i < quoteWords.length - 1 ? " " : ""}</>)}
+      </blockquote>
+      <cite>{t.cite}</cite>
+    </div>
+
+    <p class="landasan-close rv">
+      {closeParts.map((part) => part === "Sundanese Thermal Escape" ? <strong>{part}</strong> : part)}
+    </p>
+  </div>
+</section>
+
+<style>
+  .landasan { background: var(--sage); padding: clamp(5rem, 12vh, 9rem) 5vw; }
+  .landasan-in { max-width: var(--maxw); margin: 0 auto; }
+  .landasan .paren { color: rgba(78, 65, 23, .55); display: block; margin-bottom: 14px; }
+  .landasan h2 { font-size: clamp(2rem, 4.2vw, 3.4rem); font-weight: 500; letter-spacing: -.02em; line-height: 1.12; max-width: 20ch; }
+  .landasan-lead { margin-top: 26px; max-width: 60ch; font-size: 17px; color: rgba(78, 65, 23, .85); }
+
+  .prinsip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.2vw; margin-top: clamp(3rem, 7vh, 4.5rem); }
+  @media (max-width: 900px) { .prinsip { grid-template-columns: 1fr; gap: 34px; } }
+  .prin { position: relative; padding-top: 22px; }
+  .prin::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: rgba(78, 65, 23, .4); transform: scaleX(0); transform-origin: left;
+    transition: transform 1.2s cubic-bezier(.22, 1, .36, 1);
+    transition-delay: inherit;
+  }
+  .prin.in::before { transform: scaleX(1); }
+  .prin .kicker { color: var(--olive); display: block; margin-bottom: 12px; }
+  .prin h3 { font-size: clamp(1.35rem, 2vw, 1.7rem); font-weight: 500; letter-spacing: -.01em; }
+  .prin p { font-size: 14.5px; color: rgba(78, 65, 23, .75); margin-top: 10px; max-width: 36ch; }
+
+  .landasan-quote { margin-top: clamp(3.5rem, 8vh, 5.5rem); max-width: 860px; }
+  .landasan-quote blockquote {
+    font-size: clamp(1.35rem, 2.4vw, 2rem); font-weight: 500; line-height: 1.5;
+    letter-spacing: -.01em; font-style: italic;
+  }
+  .landasan-quote blockquote :global(.qw) {
+    background-image: linear-gradient(rgba(239, 236, 232, .95), rgba(239, 236, 232, .95));
+    background-repeat: no-repeat; background-size: 0% 78%; background-position: 0 58%;
+    padding: .04em .1em; margin: 0 -.04em; border-radius: 3px;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+    transition: background-size .45s ease;
+  }
+  .landasan-quote blockquote :global(.qw.hl) { background-size: 100% 78%; }
+  .landasan-quote cite {
+    display: block; margin-top: 18px; font-style: normal; font-size: 12px; letter-spacing: .2em;
+    /* Prototipe memakai .6, tapi di atas --sage itu cuma 2,7:1 sedangkan
+       teks 12px butuh 4,5:1. Dinaikkan ke .85 → lolos. */
+    text-transform: uppercase; color: rgba(78, 65, 23, .85); font-weight: 600;
+  }
+  .landasan-close {
+    margin-top: clamp(2.5rem, 6vh, 4rem); max-width: 62ch; font-size: 17px;
+    color: rgba(78, 65, 23, .9); border-top: 1px solid rgba(78, 65, 23, .3); padding-top: 28px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prin::before { transform: scaleX(1); }
+    .landasan-quote blockquote :global(.qw) { background-size: 100% 78%; }
+  }
+</style>
+
+<script>
+  const q = document.getElementById("quoteHl");
+  if (q) {
+    const spans = Array.from(q.querySelectorAll<HTMLElement>(".qw"));
+
+    // Sama seperti di Statement: baca tata letak sekali per frame, dan cuma
+    // sentuh span yang benar-benar berganti keadaan. Menyentuh semuanya tiap
+    // event scroll adalah salah satu sumber Total Blocking Time yang tinggi.
+    let terpasang = 0;
+    let menunggu = false;
+
+    const terapkan = () => {
+      menunggu = false;
+      const r = q.getBoundingClientRect();
+      const start = innerHeight * 0.9;
+      const end = innerHeight * 0.35;
+      let prog = (start - r.top) / (start - end);
+      prog = Math.max(0, Math.min(1, prog));
+      const lit = Math.max(
+        0,
+        Math.min(spans.length, Math.round(prog * spans.length)),
+      );
+      if (lit === terpasang) return;
+      if (lit > terpasang) {
+        for (let k = terpasang; k < lit; k++) spans[k].classList.add("hl");
+      } else {
+        for (let k = lit; k < terpasang; k++) spans[k].classList.remove("hl");
+      }
+      terpasang = lit;
+    };
+
+    const onScroll = () => {
+      if (menunggu) return;
+      menunggu = true;
+      requestAnimationFrame(terapkan);
+    };
+
+    addEventListener("scroll", onScroll, { passive: true });
+    terapkan();
+  }
+</script>

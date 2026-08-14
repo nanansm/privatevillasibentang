@@ -1,0 +1,227 @@
+---
+// Port dari prototipe <section class="contact" id="reservasi">, termasuk
+// baris footer (lockup + copyright) yang di prototipe menumpang di dalam
+// .contact-panel yang sama.
+//
+// Beda sengaja dari prototipe: backdrop TIDAK pakai
+// background-attachment:fixed (bikin scroll jank, terutama di mobile).
+// Diganti <Picture> astro:assets, posisi absolut, object-fit:cover,
+// loading="lazy" menutup section — panel gelap tetap menumpuk di atasnya.
+import { Picture } from "astro:assets";
+import taman from "../assets/foto2026/taman.jpg";
+import lockup from "../assets/brand/lockup-utama.svg?raw";
+import { copy, type Lang } from "../i18n/copy";
+import { waUrl, MAPS_URL, IG_URL, TRAVELOKA_URL } from "../config";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang];
+---
+
+<section class="contact" id="reservasi">
+  <Picture
+    src={taman}
+    alt=""
+    widths={[640, 960, 1280, 1920]}
+    sizes="100vw"
+    formats={["avif", "webp"]}
+    loading="lazy"
+    pictureAttributes={{ class: "contact-bg-frame", "aria-hidden": "true" }}
+    class="contact-bg"
+  />
+  <div class="contact-panel wrap">
+    <div class="contact-left">
+      <span class="paren">{t.contact.paren}</span>
+      <h2>{t.contact.h2}</h2>
+      <p>{t.contact.p}</p>
+      <div class="contact-where">
+        <span class="kicker">{t.contact.locationLabel}</span>
+        <a href={MAPS_URL} target="_blank" rel="noopener">{t.contact.locationValue}</a>
+      </div>
+    </div>
+    <div class="contact-right">
+      <!-- Dua ajakan dikelompokkan supaya jaraknya rapat dan terbaca
+           sebagai sepasang, bukan dua blok yang tak berhubungan. WhatsApp
+           tetap yang utama; Traveloka diredupkan sedikit sebagai pilihan
+           kedua. -->
+      <div class="cta-stack">
+        <a class="wa-big" href={waUrl(t.contact.waMessage)} target="_blank" rel="noopener">
+          <span class="t">{t.contact.waButtonLabel}</span>
+          <span class="arr">→</span>
+        </a>
+        <a class="wa-big wa-second" href={TRAVELOKA_URL} target="_blank" rel="noopener">
+          <span class="t">{t.contact.travelokaLabel}</span>
+          <span class="arr">→</span>
+        </a>
+      </div>
+      <p class="contact-note">{t.contact.note}</p>
+      <p class="contact-ig">
+        {t.contact.igLabel} —
+        <a href={IG_URL} target="_blank" rel="noopener">
+          {t.contact.igHandle}
+        </a>
+      </p>
+    </div>
+    <div class="contact-foot">
+      <div class="contact-foot-logo" set:html={lockup} />
+      <span>{t.contact.copyright}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    padding: clamp(6rem, 16vh, 12rem) 5vw;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .contact :global(.contact-bg-frame) {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: block;
+  }
+  .contact :global(.contact-bg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .contact-panel {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    background: rgba(63, 52, 18, 0.94);
+    color: var(--paper);
+    padding: clamp(3rem, 6vw, 5.5rem);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5vw;
+  }
+  @media (max-width: 900px) {
+    .contact-panel {
+      grid-template-columns: 1fr;
+      gap: 44px;
+    }
+  }
+  .contact .paren {
+    color: rgba(239, 236, 232, 0.6);
+  }
+  .contact h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    margin-top: 12px;
+  }
+  .contact-left p {
+    margin-top: 22px;
+    font-size: 15.5px;
+    color: rgba(239, 236, 232, 0.78);
+    max-width: 44ch;
+  }
+  .contact-where {
+    margin-top: 38px;
+    border-top: 1px solid rgba(239, 236, 232, 0.25);
+    padding-top: 20px;
+    display: flex;
+    gap: 18px;
+    align-items: baseline;
+  }
+  .contact-where .kicker {
+    color: rgba(239, 236, 232, 0.55);
+  }
+  .contact-where a {
+    font-size: 15px;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .contact-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 26px;
+  }
+  .cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .wa-big {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 1px solid rgba(239, 236, 232, 0.4);
+    padding: 22px 26px;
+    color: inherit;
+    transition: 0.25s;
+  }
+  /* Pilihan kedua: kotak dan tinggi sama, cuma garis dan hurufnya lebih
+     redup supaya WhatsApp tetap yang dituju lebih dulu. Saat disentuh
+     perlakuannya sama persis, jadi tidak terasa seperti tautan kelas dua. */
+  .wa-second {
+    border-color: rgba(239, 236, 232, 0.22);
+    color: rgba(239, 236, 232, 0.78);
+  }
+  .wa-second:hover {
+    color: var(--ink);
+  }
+  .wa-big:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .wa-big .t {
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .wa-big .arr {
+    font-size: 18px;
+    transition: transform 0.25s ease;
+  }
+  .wa-big:hover .arr {
+    transform: translateX(6px);
+  }
+  .contact-note {
+    font-size: 13.5px;
+    color: rgba(239, 236, 232, 0.6);
+    max-width: 40ch;
+  }
+  .contact-ig {
+    font-size: 13.5px;
+    color: rgba(239, 236, 232, 0.75);
+  }
+  .contact-ig a {
+    color: inherit;
+    border-bottom: 1px solid rgba(239, 236, 232, 0.4);
+    padding-bottom: 2px;
+  }
+  .contact-foot {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(239, 236, 232, 0.2);
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .contact-foot-logo {
+    width: 200px;
+    color: var(--paper);
+  }
+  .contact-foot-logo :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .contact-foot span {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 236, 232, 0.55);
+  }
+</style>

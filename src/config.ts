@@ -37,22 +37,9 @@ export const ALAMAT = "Jl. Raya Cipanas No. 122, Tarogong Kaler, Garut 44151";
 
 // Rating dibuang atas permintaan klien, dilarang dipakai di materi apa pun.
 
-export const PRICE_FROM_1BR = 3059000;
-export const PRICE_FROM_2BR = 4259000;
-
-// BAR weekend, dynamic pricing, sumber sheet internal klien 12 Agu 2026.
-export const PRICE_WEEKEND_1BR = 3719000;
-export const PRICE_WEEKEND_2BR = 5599000;
-
 // Klausa tambahan jawaban "bisa mobil masuk?", kosong sampai dikonfirmasi.
 // [BUTUH DATA: konfirmasi lebar akses internal + parkir per villa]
 export const ACCESS_INFO_EXTRA = "";
 
-/** Format rupiah tanpa desimal, mis. formatIDR(1500000) -> "1.500.000". */
-export function formatIDR(n: number): string {
-  return n.toLocaleString("id-ID");
-}
-
-// Gerbang peluncuran (lihat blueprint bagian 6 langkah 8): homepage tetap
-// noindex sampai kedua harga terisi DAN klausa akses terjawab.
-export const LAUNCH_READY = PRICE_FROM_1BR > 0 && PRICE_FROM_2BR > 0;
+// Harga tidak lagi ditampilkan di web mana pun — tarif dijawab manual lewat
+// WhatsApp saja (lihat instruksi task plumbing 14 Agu 2026).

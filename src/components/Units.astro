@@ -1,0 +1,191 @@
+---
+// Units grid (sembilan nama bunga). Port dari prototipe
+// Sibentang-Website/index.html — `.units#unit`.
+// Kiri: kolom copy sticky (paren, h2, paragraf, figure pintu.jpg, CTA
+// WhatsApp). Kanan: grid 3x3 sembilan tile (ikon bunga + nama + tipe).
+// Ikon SVG (fill=currentColor) di-inline ?raw + set:html, pola yang
+// sudah dipakai FlowerRegistry.astro/Irama.astro.
+import { Picture } from "astro:assets";
+import pintu from "../assets/foto2026/pintu.jpg";
+import melati from "../assets/brand/unit-melati.svg?raw";
+import aster from "../assets/brand/unit-aster.svg?raw";
+import asoka from "../assets/brand/unit-asoka.svg?raw";
+import mawar from "../assets/brand/unit-mawar.svg?raw";
+import padma from "../assets/brand/unit-padma.svg?raw";
+import seruni from "../assets/brand/unit-seruni.svg?raw";
+import cendana from "../assets/brand/unit-cendana.svg?raw";
+import lily from "../assets/brand/unit-lily.svg?raw";
+import anggrek from "../assets/brand/unit-anggrek.svg?raw";
+import { copy, type Lang } from "../i18n/copy";
+import { waUrl } from "../config";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = copy[lang];
+
+const iconByName: Record<string, string> = {
+  melati,
+  aster,
+  asoka,
+  mawar,
+  padma,
+  seruni,
+  cendana,
+  lily,
+  anggrek,
+};
+
+const typeLabel: Record<"oneBedroom" | "twoBedroom", string> = {
+  oneBedroom: t.units.oneBedroomLabel,
+  twoBedroom: t.units.twoBedroomLabel,
+};
+---
+
+<section class="units" id="unit">
+  <div class="units-in">
+    <div class="units-copy">
+      <span class="paren rv">{t.units.paren}</span>
+      <h2 class="rv">{t.units.h2}</h2>
+      <p class="rv">{t.units.p}</p>
+      <figure class="rv">
+        <Picture
+          src={pintu}
+          alt={t.units.figureAlt}
+          widths={[340, 480, 680]}
+          sizes="(min-width:901px) 340px, 60vw"
+          formats={["avif", "webp"]}
+          loading="lazy"
+          class="block aspect-[3/4] w-full object-cover"
+        />
+        <figcaption>{t.units.figcaption}</figcaption>
+      </figure>
+      <a class="btn-ghost rv" href={waUrl(t.units.waMessage)} target="_blank" rel="noopener">
+        {t.units.ctaLabel}
+      </a>
+    </div>
+    <div class="unit-grid">
+      {
+        t.units.list.map((u, i) => (
+          <div class="u-tile rv" style={`transition-delay:${(i * 0.06).toFixed(2)}s`}>
+            <span class="u-icon" set:html={iconByName[u.name.toLowerCase()]} />
+            <span class="u-name">{u.name}</span>
+            <span class="u-type">{typeLabel[u.type]}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .units {
+    padding: clamp(5rem, 12vh, 9rem) 5vw;
+    border-top: 1px solid var(--line);
+  }
+  .units-in {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 5vw;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .units-in {
+      grid-template-columns: 1fr;
+      gap: 44px;
+    }
+  }
+  .units-copy {
+    position: sticky;
+    top: 90px;
+  }
+  @media (max-width: 900px) {
+    .units-copy {
+      position: static;
+    }
+  }
+  .units-copy .paren {
+    display: block;
+    margin-bottom: 14px;
+  }
+  .units-copy h2 {
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    max-width: 16ch;
+  }
+  .units-copy p {
+    margin-top: 24px;
+    max-width: 46ch;
+    font-size: 16px;
+    color: rgba(78, 65, 23, 0.8);
+  }
+  .units-copy figure {
+    margin-top: 38px;
+    max-width: 340px;
+  }
+  .units-copy figcaption {
+    font-size: 12.5px;
+    color: rgba(78, 65, 23, 0.6);
+    margin-top: 10px;
+  }
+  .units-copy .btn-ghost {
+    margin-top: 34px;
+  }
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 560px) {
+    .unit-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .u-tile {
+    border: 1px solid var(--line);
+    padding: 30px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    transition:
+      background 0.4s ease,
+      border-color 0.4s ease;
+  }
+  .u-tile:hover {
+    background: rgba(206, 205, 178, 0.4);
+    border-color: rgba(78, 65, 23, 0.35);
+  }
+  .u-icon {
+    display: block;
+    width: 46px;
+    height: 46px;
+    color: var(--olive);
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .u-icon :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .u-tile:hover .u-icon {
+    transform: rotate(10deg) scale(1.14);
+  }
+  .u-name {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+  }
+  .u-type {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(78, 65, 23, 0.55);
+  }
+</style>

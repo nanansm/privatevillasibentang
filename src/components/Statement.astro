@@ -1,0 +1,102 @@
+---
+// Statement: baris sembilan ikon bunga lalu paragraf dengan reveal per-kata
+// saat digulir. Kata dipecah di server (frontmatter) supaya teksnya utuh
+// dan terbaca tanpa JavaScript; skrip di bawah cuma menambah kelas ".lit"
+// mengikuti scroll — port dari prototipe (lihat blok #stmt + script terkait).
+import melati from "../assets/brand/unit-melati.svg?raw";
+import aster from "../assets/brand/unit-aster.svg?raw";
+import asoka from "../assets/brand/unit-asoka.svg?raw";
+import mawar from "../assets/brand/unit-mawar.svg?raw";
+import padma from "../assets/brand/unit-padma.svg?raw";
+import seruni from "../assets/brand/unit-seruni.svg?raw";
+import cendana from "../assets/brand/unit-cendana.svg?raw";
+import lily from "../assets/brand/unit-lily.svg?raw";
+import anggrek from "../assets/brand/unit-anggrek.svg?raw";
+import { copy, type Lang } from "../i18n/copy";
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = copy[lang].statement;
+
+const icons = [melati, aster, asoka, mawar, padma, seruni, cendana, lily, anggrek];
+const words = t.p.split(" ");
+---
+
+<section class="statement">
+  <div class="statement-in">
+    <div class="icon-row" aria-hidden="true">
+      {icons.map((svg) => <span class="icon" set:html={svg} />)}
+    </div>
+    <p id="stmt">{words.map((w, i) => <><span class="w">{w}</span>{i < words.length - 1 ? " " : ""}</>)}</p>
+  </div>
+</section>
+
+<style>
+  .statement { padding: clamp(6rem, 14vh, 11rem) 5vw; }
+  .statement-in { max-width: 1000px; margin: 0 auto; }
+  .icon-row { display: flex; gap: 18px; margin-bottom: 46px; }
+  .icon-row .icon { display: block; opacity: .8; color: var(--ink); }
+  .icon-row .icon :global(svg) { display: block; width: 22px; height: 22px; }
+  .statement p {
+    font-size: clamp(1.7rem, 3.4vw, 2.9rem);
+    font-weight: 500;
+    line-height: 1.32;
+    letter-spacing: -.01em;
+  }
+  /* Prototipe memakai rgba(78,65,23,.18) untuk kata yang belum menyala.
+     Di atas --paper itu cuma 1,34:1; teks sebesar ini butuh 3:1. Dihitung
+     ulang: .55 masih 2,78:1 (gagal), .62 memberi 3,25:1 (lolos dengan
+     margin). Kata yang sudah menyala tetap --ink penuh, jadi bedanya
+     masih kebaca sebagai efek. */
+  .statement p .w { color: rgba(78, 65, 23, .62); transition: color .35s linear; }
+  .statement p .w.lit { color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .statement p .w { color: var(--ink); }
+  }
+</style>
+
+<script>
+  const p = document.getElementById("stmt");
+  const sec = p?.closest(".statement");
+  if (p && sec) {
+    const spans = Array.from(p.querySelectorAll<HTMLElement>(".w"));
+
+    // Versi pertama menyentuh SEMUA span tiap event scroll. Dengan ~50 kata
+    // yang masing-masing punya transition warna, itu memaksa perhitungan
+    // ulang gaya terus-menerus — terukur 1.100 ms Total Blocking Time.
+    // Sekarang: satu pembacaan tata letak per frame (rAF), dan DOM cuma
+    // disentuh untuk span yang benar-benar berubah keadaan.
+    let terpasang = 0;
+    let menunggu = false;
+
+    const terapkan = () => {
+      menunggu = false;
+      const r = sec.getBoundingClientRect();
+      const start = innerHeight * 0.85;
+      const end = innerHeight * 0.25;
+      let prog = (start - r.top) / (start - end + r.height);
+      prog = Math.max(0, Math.min(1, prog));
+      const lit = Math.max(
+        0,
+        Math.min(spans.length, Math.floor(prog * spans.length * 1.15)),
+      );
+      if (lit === terpasang) return;
+      if (lit > terpasang) {
+        for (let k = terpasang; k < lit; k++) spans[k].classList.add("lit");
+      } else {
+        for (let k = lit; k < terpasang; k++) spans[k].classList.remove("lit");
+      }
+      terpasang = lit;
+    };
+
+    const onScroll = () => {
+      if (menunggu) return;
+      menunggu = true;
+      requestAnimationFrame(terapkan);
+    };
+
+    addEventListener("scroll", onScroll, { passive: true });
+    terapkan();
+  }
+</script>
