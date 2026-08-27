@@ -123,9 +123,12 @@ const t = copy[lang];
     // melaporkan LCP 4,8 dtk.
     //
     // Sekarang video baru dimuat pada yang lebih dulu terjadi antara:
-    //   - 2,5 detik sesudah 'load' (jalur kritis dijamin sudah kosong), atau
-    //   - sentuhan/gulir/tombol pertama dari pengunjung — masukan pertama
-    //     memang menutup pengukuran LCP, jadi sesudah itu video bebas.
+    //   - sentuhan/gulir/tombol pertama dari pengunjung, atau
+    //   - 10 detik sesudah 'load' sebagai jaring pengaman untuk pembaca yang
+    //     diam saja di layar besar.
+    // Pengunjung ponsel hampir selalu menggulir dalam hitungan detik, jadi
+    // praktisnya video tetap menyala cepat; yang hilang cuma 626 KB yang
+    // dulu ikut berebut bandwidth di detik-detik pertama.
     // Poster tetap tampil selama jeda, jadi tidak ada state kosong.
     var mulai = false;
     function jadwalkan() {
@@ -139,7 +142,7 @@ const t = copy[lang];
     }
 
     window.addEventListener("load", function () {
-      var t = setTimeout(jadwalkan, 2500);
+      var t = setTimeout(jadwalkan, 10000);
       ["pointerdown", "scroll", "keydown", "touchstart"].forEach(function (ev) {
         window.addEventListener(
           ev,
