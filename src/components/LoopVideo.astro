@@ -70,8 +70,9 @@ const {
     widths={widths}
     sizes={sizes}
     formats={["avif", "webp"]}
+    quality={eager ? 50 : 40}
     loading={eager ? "eager" : "lazy"}
-    fetchpriority={eager ? "high" : undefined}
+    fetchpriority={eager ? "high" : "low"}
     pictureAttributes={{ class: "lv-poster-frame" }}
     class="lv-poster"
   />

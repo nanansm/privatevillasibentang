@@ -34,6 +34,7 @@ const t = copy[lang];
       widths={[540, 810, 1080]}
       sizes="100vw"
       formats={["avif", "webp"]}
+      quality={45}
       loading="eager"
       fetchpriority="high"
       pictureAttributes={{ class: "hero-poster-frame" }}
@@ -112,19 +113,43 @@ const t = copy[lang];
       );
     }
 
-    // Sebelumnya digantung di event 'load', yang baru menyala setelah SEMUA
-    // gambar (termasuk yang lazy di bawah lipatan) selesai. Terukur: video
-    // baru mulai diunduh di 2.145 ms, fade-nya kelar ~2,8 dtk, dan itulah
-    // yang menahan LCP di 2,9 dtk padahal halaman sudah terlihat utuh di
-    // 0,9 dtk. Sekarang dijadwalkan lewat idle callback ber-timeout, jadi
-    // video menyusul sesaat setelah jalur kritis kosong, bukan setelah
-    // seluruh halaman selesai.
-    window.addEventListener("load", function () {
+    // Penjadwalan sengaja mundur jauh dari 'load'.
+    //
+    // Elemen LCP halaman ini bukan gambar, tapi teks <h1> — dan teks itu
+    // menunggu KumbhSans.woff2. Waktu video digantung di 'load' + idle
+    // callback, 626 KB video ikut berebut bandwidth dengan font itu di
+    // jendela yang sama. Di trace Lighthouse (Lantern) h1 yang sebenarnya
+    // melukis di 71 ms jadi tercatat 3,4 dtk, dan PageSpeed produksi
+    // melaporkan LCP 4,8 dtk.
+    //
+    // Sekarang video baru dimuat pada yang lebih dulu terjadi antara:
+    //   - 2,5 detik sesudah 'load' (jalur kritis dijamin sudah kosong), atau
+    //   - sentuhan/gulir/tombol pertama dari pengunjung — masukan pertama
+    //     memang menutup pengukuran LCP, jadi sesudah itu video bebas.
+    // Poster tetap tampil selama jeda, jadi tidak ada state kosong.
+    var mulai = false;
+    function jadwalkan() {
+      if (mulai) return;
+      mulai = true;
       if ("requestIdleCallback" in window) {
-        (window as any).requestIdleCallback(loadVideo);
+        (window as any).requestIdleCallback(loadVideo, { timeout: 1000 });
       } else {
-        setTimeout(loadVideo, 200);
+        loadVideo();
       }
+    }
+
+    window.addEventListener("load", function () {
+      var t = setTimeout(jadwalkan, 2500);
+      ["pointerdown", "scroll", "keydown", "touchstart"].forEach(function (ev) {
+        window.addEventListener(
+          ev,
+          function () {
+            clearTimeout(t);
+            jadwalkan();
+          },
+          { once: true, passive: true },
+        );
+      });
     });
   })();
 </script>
