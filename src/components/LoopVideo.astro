@@ -122,17 +122,19 @@ const {
   type LV = HTMLDivElement;
 
   const nav = navigator as Navigator & {
-    connection?: { saveData?: boolean; effectiveType?: string };
-    deviceMemory?: number;
+    connection?: { saveData?: boolean };
   };
 
   function murah(): boolean {
-    // Peranti/kuota yang tidak layak dibebani video: poster saja.
+    // Cuma percaya sinyal yang jujur: hemat kuota eksplisit (saveData) dan
+    // preferensi reduced-motion. `effectiveType` dan `deviceMemory` DIBUANG
+    // (27 Agu 2026) — keduanya bikin video mati total di laptop wajar:
+    // deviceMemory Chrome dibulatkan ke 4 buat RAM 4-6GB (tier umum di ID),
+    // dan effectiveType sering salah baca WiFi kencang sebagai 2g/3g. Video
+    // sudah aman page-speed-nya lewat IntersectionObserver (unduh baru pas
+    // 300px dari layar) — gate tambahan ini cuma nambah gagal-diam-diam.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-    const c = nav.connection;
-    if (c?.saveData) return false;
-    if (c?.effectiveType && /(^|-)2g$|^3g$/.test(c.effectiveType)) return false;
-    if (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) return false;
+    if (nav.connection?.saveData) return false;
     return true;
   }
 

@@ -92,9 +92,16 @@ const t = copy[lang];
         video.appendChild(source);
       });
       video.load();
+      // Jaring pengaman: kalau berkas 404/kodek tidak didukung, canplay
+      // tidak akan pernah nyala — jangan gantung diam-diam, minimal ada
+      // jejak di console buat debug lintas-perangkat.
+      var gagal = setTimeout(function () {
+        console.warn("[hero] video canplay timeout, poster tetap tampil");
+      }, 8000);
       video.addEventListener(
         "canplay",
         function onCanPlay() {
+          clearTimeout(gagal);
           video.removeEventListener("canplay", onCanPlay);
           var playPromise = video.play();
           if (playPromise && typeof playPromise.then === "function") {
@@ -113,46 +120,47 @@ const t = copy[lang];
       );
     }
 
-    // Penjadwalan sengaja mundur jauh dari 'load'.
-    //
     // Elemen LCP halaman ini bukan gambar, tapi teks <h1> — dan teks itu
-    // menunggu KumbhSans.woff2. Waktu video digantung di 'load' + idle
-    // callback, 626 KB video ikut berebut bandwidth dengan font itu di
-    // jendela yang sama. Di trace Lighthouse (Lantern) h1 yang sebenarnya
-    // melukis di 71 ms jadi tercatat 3,4 dtk, dan PageSpeed produksi
-    // melaporkan LCP 4,8 dtk.
+    // menunggu KumbhSans.woff2. Kalau video ikut diminta di jendela yang
+    // sama, 626 KB itu berebut bandwidth dengan font dan LCP molor (pernah
+    // tercatat 4,8 dtk di PageSpeed produksi).
     //
-    // Sekarang video baru dimuat pada yang lebih dulu terjadi antara:
-    //   - sentuhan/gulir/tombol pertama dari pengunjung, atau
-    //   - 10 detik sesudah 'load' sebagai jaring pengaman untuk pembaca yang
-    //     diam saja di layar besar.
-    // Pengunjung ponsel hampir selalu menggulir dalam hitungan detik, jadi
-    // praktisnya video tetap menyala cepat; yang hilang cuma 626 KB yang
-    // dulu ikut berebut bandwidth di detik-detik pertama.
-    // Poster tetap tampil selama jeda, jadi tidak ada state kosong.
+    // Versi lama gantung video di 'load' (baru nyala sesudah SEMUA resource
+    // halaman kelar — bisa molor tak terduga) + jaring pengaman 10 detik +
+    // WAJIB ada interaksi pengunjung. Di lapangan itu kepanjangan/rapuh:
+    // dilaporkan video sama sekali tidak jalan di beberapa laptop & HP
+    // (27 Agu 2026). Sinyal yang dipakai sekarang jauh lebih tepat sasaran:
+    // document.fonts.ready — persis saat font LCP itu kelar, bukan nunggu
+    // seluruh halaman — dengan jaring pengaman 3 detik kalau API-nya tidak
+    // ada/macet. Tidak butuh interaksi sama sekali; interaksi cuma jalur
+    // cepat kalau kejadian duluan. Poster tetap tampil selama jeda.
     var mulai = false;
     function jadwalkan() {
       if (mulai) return;
       mulai = true;
       if ("requestIdleCallback" in window) {
-        (window as any).requestIdleCallback(loadVideo, { timeout: 1000 });
+        window.requestIdleCallback(loadVideo, { timeout: 500 });
       } else {
         loadVideo();
       }
     }
 
-    window.addEventListener("load", function () {
-      var t = setTimeout(jadwalkan, 10000);
-      ["pointerdown", "scroll", "keydown", "touchstart"].forEach(function (ev) {
-        window.addEventListener(
-          ev,
-          function () {
-            clearTimeout(t);
-            jadwalkan();
-          },
-          { once: true, passive: true },
-        );
+    var pengaman = setTimeout(jadwalkan, 3000);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        clearTimeout(pengaman);
+        jadwalkan();
       });
+    }
+    ["pointerdown", "scroll", "keydown", "touchstart"].forEach(function (ev) {
+      window.addEventListener(
+        ev,
+        function () {
+          clearTimeout(pengaman);
+          jadwalkan();
+        },
+        { once: true, passive: true },
+      );
     });
   })();
 </script>
