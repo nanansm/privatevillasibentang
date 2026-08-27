@@ -1,0 +1,246 @@
+---
+// LoopVideo — poster gambar (elemen nyata, ikut astro:assets) dengan video
+// loop bisu yang ditumpuk di atasnya.
+//
+// Aturan yang dijaga komponen ini, semuanya demi page speed:
+//  1. HTML pertama TIDAK memuat sumber video sama sekali (preload="none",
+//     tanpa <source>). Byte video baru diminta saat pengunjung mendekat.
+//  2. Poster = gambar biasa lewat <Picture> (avif+webp, loading lazy), jadi
+//     halaman tetap utuh kalau video tidak pernah dimuat.
+//  3. Kotak rasio dikunci lewat `ratio`, jadi tidak ada geser tata letak.
+//  4. Satu video main pada satu waktu; sisanya dijeda di frame poster.
+//  5. Hemat data / reduced-motion / peranti lemah -> video tidak diunduh.
+//
+// Pemutaran diatur skrip bersama di bawah (Astro menyatukan skrip identik
+// dari semua pemakaian jadi satu berkas).
+import { Picture } from "astro:assets";
+
+interface Props {
+  /** Nama berkas di /public/video tanpa ekstensi; .webm (AV1) + .mp4 (H.264). */
+  base: string;
+  poster: ImageMetadata;
+  alt?: string;
+  widths: number[];
+  sizes: string;
+  /** Rasio kotak, mis. "3 / 4". Diabaikan kalau `fill`. */
+  ratio?: string;
+  /**
+   * Isi penuh induk terdekat yang berposisi (dipakai buat latar Contact dan
+   * panel Moments), bukan bikin kotak rasio sendiri.
+   */
+  fill?: boolean;
+  /** Kelas untuk pembungkus. */
+  class?: string;
+  /**
+   * Selektor leluhur yang harus punya kelas `on` supaya video boleh main.
+   * Dipakai di Moments, yang gambarnya bertumpuk dan cuma satu yang terlihat.
+   */
+  gate?: string;
+  /** Poster jadi elemen LCP (hero): dimuat eager, prioritas tinggi. */
+  eager?: boolean;
+  /** object-position poster & video, mis. "38% center". */
+  pos?: string;
+}
+
+const {
+  base,
+  poster,
+  alt = "",
+  widths,
+  sizes,
+  ratio = "3 / 4",
+  fill = false,
+  class: className = "",
+  gate,
+  eager = false,
+  pos = "center",
+} = Astro.props;
+---
+
+<div
+  class:list={["lv", { "lv-fill": fill }, className]}
+  style={`--lv-ratio:${ratio};--lv-pos:${pos}`}
+  data-lv
+  data-base={base}
+  data-gate={gate}
+>
+  <Picture
+    src={poster}
+    alt={alt}
+    widths={widths}
+    sizes={sizes}
+    formats={["avif", "webp"]}
+    loading={eager ? "eager" : "lazy"}
+    fetchpriority={eager ? "high" : undefined}
+    pictureAttributes={{ class: "lv-poster-frame" }}
+    class="lv-poster"
+  />
+  <video class="lv-video" muted loop playsinline preload="none" aria-hidden="true"></video>
+</div>
+
+<style>
+  .lv {
+    position: relative;
+    aspect-ratio: var(--lv-ratio);
+    width: 100%;
+    overflow: hidden;
+  }
+  .lv.lv-fill {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .lv :global(.lv-poster-frame),
+  .lv :global(.lv-poster),
+  .lv .lv-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: var(--lv-pos, center);
+  }
+  .lv .lv-video {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .lv .lv-video[data-on] {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lv .lv-video {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Satu pengelola untuk semua LoopVideo di halaman.
+  type LV = HTMLDivElement;
+
+  const nav = navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+    deviceMemory?: number;
+  };
+
+  function murah(): boolean {
+    // Peranti/kuota yang tidak layak dibebani video: poster saja.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    const c = nav.connection;
+    if (c?.saveData) return false;
+    if (c?.effectiveType && /(^|-)2g$|^3g$/.test(c.effectiveType)) return false;
+    if (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) return false;
+    return true;
+  }
+
+  function boleh(box: LV): boolean {
+    const sel = box.dataset.gate;
+    if (!sel) return true;
+    const induk = box.closest(sel);
+    return !!induk && induk.classList.contains("on");
+  }
+
+  function pasangSumber(box: LV, vid: HTMLVideoElement) {
+    if (vid.dataset.siap) return;
+    vid.dataset.siap = "1";
+    const base = box.dataset.base!;
+    for (const [ext, type] of [
+      ["webm", "video/webm"],
+      ["mp4", "video/mp4"],
+    ]) {
+      const s = document.createElement("source");
+      s.src = `/video/${base}.${ext}`;
+      s.type = type;
+      vid.appendChild(s);
+    }
+    vid.load();
+  }
+
+  function mulai() {
+    const kotak = Array.from(document.querySelectorAll<LV>("[data-lv]"));
+    if (!kotak.length || !murah()) return;
+
+    let main: HTMLVideoElement | null = null;
+
+    function putar(box: LV) {
+      const vid = box.querySelector<HTMLVideoElement>(".lv-video");
+      if (!vid || !boleh(box)) return;
+      pasangSumber(box, vid);
+      if (main && main !== vid) {
+        main.pause();
+        delete main.dataset.on;
+      }
+      main = vid;
+      vid.play().then(
+        () => {
+          vid.dataset.on = "1";
+        },
+        () => {
+          // Autoplay ditolak (mis. iOS Low Power Mode): poster tetap tampil.
+          delete vid.dataset.on;
+        },
+      );
+    }
+
+    function jeda(box: LV) {
+      const vid = box.querySelector<HTMLVideoElement>(".lv-video");
+      if (!vid) return;
+      vid.pause();
+      delete vid.dataset.on;
+      if (main === vid) main = null;
+    }
+
+    // Dekat layar -> unduh. Cukup terlihat -> main.
+    const unduh = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const box = e.target as LV;
+          const vid = box.querySelector<HTMLVideoElement>(".lv-video");
+          if (vid) pasangSumber(box, vid);
+          unduh.unobserve(box);
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+
+    const tampil = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const box = e.target as LV;
+          if (e.isIntersecting && e.intersectionRatio >= 0.5) putar(box);
+          else jeda(box);
+        }
+      },
+      { threshold: [0, 0.5] },
+    );
+
+    for (const box of kotak) {
+      unduh.observe(box);
+      tampil.observe(box);
+
+      // Kotak bergerbang (Moments): ikut perubahan kelas `on` di induknya.
+      const sel = box.dataset.gate;
+      if (!sel) continue;
+      const induk = box.closest(sel);
+      if (!induk) continue;
+      new MutationObserver(() => {
+        if (induk.classList.contains("on")) putar(box);
+        else jeda(box);
+      }).observe(induk, { attributes: true, attributeFilter: ["class"] });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && main) {
+        main.pause();
+        delete main.dataset.on;
+      }
+    });
+  }
+
+  // Jangan bersaing dengan LCP: tunggu halaman selesai muat dulu.
+  if (document.readyState === "complete") mulai();
+  else window.addEventListener("load", mulai, { once: true });
+</script>

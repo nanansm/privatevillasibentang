@@ -28,7 +28,12 @@ import ornamen from "../assets/brand/ornamen.svg?raw";
 // terpotong di salah satu dari dua rasio itu; foto arsitektur aman di
 // dua-duanya. Isinya tetap membuktikan janji halaman: paviliun villa yang
 // terbuka langsung ke kolam privat.
-import foto from "../assets/photos/mote-9747.jpg";
+// Hero jadi video loop dari footage drone (jalan setapak sisi kolam menuju
+// gazebo), potongan 2:3 supaya aman di dua rasio potong halaman ini. Poster
+// tetap gambar nyata dan tetap elemen LCP; video menyusul sesudah halaman
+// selesai muat, persis pola Hero homepage.
+import LoopVideo from "./LoopVideo.astro";
+import foto from "../assets/foto2026/v-link-hero-poster.jpg";
 import Irama from "./Irama.astro";
 import {
   waUrl,
@@ -90,17 +95,22 @@ const pil =
 >
   <!-- Foto penuh tepi ke tepi. Wordmark di atas, kolam di bawah tetap terlihat. -->
   <div class="relative md:col-start-1 md:row-span-2 md:row-start-1">
-    <Picture
-      src={foto}
-      alt={t.alt}
-      widths={[390, 585, 780, 960]}
-      sizes="(max-width: 480px) 100vw, 480px"
-      formats={["avif", "webp"]}
-      loading="eager"
-      fetchpriority="high"
-      pictureAttributes={{ class: "block" }}
-      class="h-[54svh] max-h-[28rem] w-full object-cover object-[38%_center] md:absolute md:inset-0 md:h-full md:max-h-none"
-    />
+    <!-- Kotak hero mengikuti rasio asli klip (2:3), lebar penuh, tinggi
+         menyesuaikan. Sebelumnya dikunci 54svh/28rem dan dipotong
+         object-cover; sekarang seluruh bingkai video terlihat utuh dan
+         halaman boleh jadi lebih panjang. -->
+    <div class="relative aspect-[2/3] w-full">
+      <LoopVideo
+        base="v-link-hero"
+        poster={foto}
+        alt={t.alt}
+        widths={[390, 585, 780, 960]}
+        sizes="(max-width: 480px) 100vw, 480px"
+        fill
+        eager
+        pos="38% center"
+      />
+    </div>
 
     <div
       class="absolute inset-x-0 top-0 bg-linear-to-b from-(--ink) via-(--ink)/70 to-transparent px-6 pt-7 pb-16 md:px-8 md:pt-9"

@@ -13,9 +13,10 @@
 // di `prefers-reduced-motion`, karena panel sticky yang tidak beranimasi
 // berarti menggulir 340vh tanpa ada yang berubah.
 import { Picture } from "astro:assets";
-import jalan from "../assets/foto2026/jalan.jpg";
-import teh from "../assets/foto2026/teh.jpg";
-import kolam from "../assets/foto2026/kolam.jpg";
+import LoopVideo from "./LoopVideo.astro";
+import tamanPoster from "../assets/foto2026/v-taman-poster.jpg";
+import breakfastPoster from "../assets/foto2026/v-breakfast-poster.jpg";
+import kolamMalam from "../assets/foto2026/kolam-malam.jpg";
 import { copy, type Lang } from "../i18n/copy";
 
 interface Props {
@@ -23,7 +24,9 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = copy[lang];
-const foto = [jalan, teh, kolam];
+// Pagi & sore jadi video loop (jalan taman, floating breakfast); malam tetap foto.
+const video = ["v-taman", "v-breakfast", null];
+const poster = [tamanPoster, breakfastPoster, kolamMalam];
 ---
 
 <div class="moments" id="momen">
@@ -33,15 +36,27 @@ const foto = [jalan, teh, kolam];
         {
           t.moments.map((m, i) => (
             <div class:list={["m-img", { on: i === 0 }]}>
-              <Picture
-                src={foto[i]}
-                alt={m.imgAlt}
-                widths={[480, 640, 860]}
-                sizes="(min-width:821px) 38vw, 92vw"
-                formats={["avif", "webp"]}
-                loading="lazy"
-                class="block h-full w-full object-cover"
-              />
+              {video[i] ? (
+                <LoopVideo
+                  base={video[i]}
+                  poster={poster[i]}
+                  alt={m.imgAlt}
+                  widths={[480, 640, 860]}
+                  sizes="(min-width:821px) 38vw, 92vw"
+                  fill
+                  gate=".m-img"
+                />
+              ) : (
+                <Picture
+                  src={poster[i]}
+                  alt={m.imgAlt}
+                  widths={[480, 640, 860]}
+                  sizes="(min-width:821px) 38vw, 92vw"
+                  formats={["avif", "webp"]}
+                  loading="lazy"
+                  class="block h-full w-full object-cover"
+                />
+              )}
             </div>
           ))
         }
@@ -210,7 +225,7 @@ const foto = [jalan, teh, kolam];
       display: contents;
     }
     .m-img {
-      position: static;
+      position: relative;
       opacity: 1 !important;
       width: 100%;
       aspect-ratio: 4 / 3;

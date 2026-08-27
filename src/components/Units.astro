@@ -5,8 +5,8 @@
 // WhatsApp). Kanan: grid 3x3 sembilan tile (ikon bunga + nama + tipe).
 // Ikon SVG (fill=currentColor) di-inline ?raw + set:html, pola yang
 // sudah dipakai FlowerRegistry.astro/Irama.astro.
-import { Picture } from "astro:assets";
-import pintu from "../assets/foto2026/pintu.jpg";
+import LoopVideo from "./LoopVideo.astro";
+import kolamPrivatPoster from "../assets/foto2026/v-kolam-privat-poster.jpg";
 import melati from "../assets/brand/unit-melati.svg?raw";
 import aster from "../assets/brand/unit-aster.svg?raw";
 import asoka from "../assets/brand/unit-asoka.svg?raw";
@@ -50,14 +50,13 @@ const typeLabel: Record<"oneBedroom" | "twoBedroom", string> = {
       <h2 class="rv">{t.units.h2}</h2>
       <p class="rv">{t.units.p}</p>
       <figure class="rv">
-        <Picture
-          src={pintu}
+        <LoopVideo
+          base="v-kolam-privat"
+          poster={kolamPrivatPoster}
           alt={t.units.figureAlt}
           widths={[340, 480, 680]}
           sizes="(min-width:901px) 340px, 60vw"
-          formats={["avif", "webp"]}
-          loading="lazy"
-          class="block aspect-[3/4] w-full object-cover"
+          ratio="3 / 4"
         />
         <figcaption>{t.units.figcaption}</figcaption>
       </figure>

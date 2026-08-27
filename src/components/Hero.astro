@@ -17,7 +17,7 @@
 // dengan fallback, jadi dipakai di sini (pola yang sama dipakai
 // Biolink.astro, lihat catatannya soal Image vs Picture).
 import { Picture } from "astro:assets";
-import heroPoster from "../assets/foto2026/hero-poster.jpg";
+import heroPoster from "../assets/foto2026/hero-jalan-portrait-poster.jpg";
 import SiteHeader from "./SiteHeader.astro";
 import { copy, type Lang } from "../i18n/copy";
 
@@ -46,7 +46,8 @@ const t = copy[lang];
       loop
       playsinline
       preload="none"
-      data-src="/video/hero.mp4"
+      data-src-portrait="/video/hero-jalan-portrait"
+      data-src-wide="/video/hero-jalan-wide"
       aria-hidden="true"
     ></video>
   </div>
@@ -73,12 +74,22 @@ const t = copy[lang];
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     function loadVideo() {
-      var src = video.getAttribute("data-src");
-      if (!src) return;
-      var source = document.createElement("source");
-      source.src = src;
-      source.type = "video/mp4";
-      video.appendChild(source);
+      // Dua encode: potret buat layar tinggi (HP), lanskap buat layar lebar.
+      // Sebelumnya cuma ada satu berkas potret, jadi di desktop 720px lebarnya
+      // dipaksa melar ke 1920px dan kelihatan lembek.
+      var wide = matchMedia("(min-aspect-ratio: 1/1)").matches;
+      var base = video.getAttribute(wide ? "data-src-wide" : "data-src-portrait");
+      if (!base) return;
+      // AV1/WebM dulu (lebih kecil), H.264 sebagai jaring pengaman.
+      [
+        [".webm", "video/webm"],
+        [".mp4", "video/mp4"],
+      ].forEach(function (pair) {
+        var source = document.createElement("source");
+        source.src = base + pair[0];
+        source.type = pair[1];
+        video.appendChild(source);
+      });
       video.load();
       video.addEventListener(
         "canplay",

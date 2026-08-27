@@ -1,9 +1,9 @@
 ---
 // Cards (tawaran): Room. Experience. Escape. Port dari prototipe
-// <section class="cards" id="tawaran">. Foto villa.jpg, ambang.jpg, taman.jpg
+// <section class="cards" id="tawaran">. Foto kamar.jpg, ambang.jpg, taman.jpg
 // dipotong 3/4 (crop disetujui pemilik) lewat astro:assets Picture.
 import { Picture } from "astro:assets";
-import villa from "../assets/foto2026/villa.jpg";
+import kamar from "../assets/foto2026/kamar.jpg";
 import ambang from "../assets/foto2026/ambang.jpg";
 import taman from "../assets/foto2026/taman.jpg";
 import { copy, type Lang } from "../i18n/copy";
@@ -12,7 +12,7 @@ interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const t = copy[lang].cards;
 
-const images = [villa, ambang, taman];
+const images = [kamar, ambang, taman];
 ---
 
 <section class="cards" id="tawaran">
